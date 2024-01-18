@@ -29,14 +29,19 @@ jobs:
             -u ${{ github.repository_owner }} \
             --password-stdin
 
-      - name: Publish Helm Chart
-        working-directory: ${{ github.workspace }}
+      - name: Publish Helm Chart to GHCR
+        id: chart
         run: |
           chart=$(find . -name '*.tgz' | sort -r | head -n 1)
           version=$(basename $chart | sed 's/\.tgz//')
           
-          docker tag $chart \
-            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}/$version
-          
-          docker push \
-            ghcr.io/${{ github.repository_owner }}/${{ github.repository }}/$version
+          ghcr_chart="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}/$version"
+          echo "::set-output name=chart::$chart"
+          echo "::set-output name=ghcr_chart::$ghcr_chart"
+
+      - name: Publish Chart to GHCR
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+          docker pull "${{ steps.chart.outputs.chart }}"
+          docker tag "${{ steps.chart.outputs.chart }}" "${{ steps.chart.outputs.ghcr_chart }}"
+          docker push "${{ steps.chart.outputs.ghcr_chart }}"
