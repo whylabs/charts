@@ -24,21 +24,14 @@ jobs:
 
       - name: Login to GHCR
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | \
-            docker login ghcr.io \
+          docker login ghcr.io \
             -u ${{ github.repository_owner }} \
-            --password-stdin
+            --password-stdin < <(echo "${{ secrets.GITHUB_TOKEN }}")
 
       - name: Publish Helm Chart to GHCR
         id: chart
         run: |
-          chart=$(find . -name '*.tgz' | sort -r | head -n 1)
-          version=$(basename $chart | sed 's/\.tgz//')
-          ghcr_chart="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:$version"
-          echo "ghcr_chart=$ghcr_chart" >> $GITHUB_ENV
-          echo "::set-output name=ghcr_chart::$ghcr_chart"
-
-      - name: Publish Chart to GHCR
-        run: |
-          docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin < <(echo "${{ secrets.GITHUB_TOKEN }}")
-          helm chart push "${{ steps.chart.outputs.ghcr_chart }}"
+          chart_version=$(grep 'version:' ./charts/langkit/Chart.yaml | tail -n1 | awk '{ print $2}')
+          ghcr_chart="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${chart_version}"
+          helm push "langkit-${chart_version}".tgz oci://ghcr.io/${{ github.repository_owner }}      
+          
