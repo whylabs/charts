@@ -1,0 +1,92 @@
+namespace:
+  create: true
+  name:
+
+replicaCount: 3
+
+image:
+  repository: whylabs/whylogs
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: py-llm-latest
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+secrets:
+  # kubectl create secret generic langkit-api-secret \
+  # --namespace=langkit \
+  # --from-literal=WHYLABS_API_KEY=<whylabs-api-key>
+  whylabsApiKey: whylabs-api-key
+  # kubectl create secret generic langkit-api-secret \
+  # --namespace=langkit \
+  # --from-literal=LANGKIT_API_KEY=<langkit-api-key>
+  langkitApiSecret: langkit-api-secret
+
+service:
+  type: ClusterIP
+  port: 8000
+
+resources:
+  requests:
+    cpu: "4"
+    memory: 8Gi
+  limits:
+    cpu: "8"
+    memory: 16Gi
+
+# livenessProbe:
+#   httpGet:
+#     path: /health
+#     port: http
+# readinessProbe:
+#   httpGet:
+#     path: /health
+#     port: http
+
+nodeSelector: {}
+
+tolerations:
+  - effect: NoSchedule
+    key: kubernetes.azure.com/scalesetpriority
+    operator: Equal
+    value: spot
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - langkit
