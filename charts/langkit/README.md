@@ -21,32 +21,34 @@ kubectl create secret generic langkit-api-secret \
 ## Usage
 
 ### Template
+Display the full YAML manifests as they will be applied.
+
 ```shell
 # This will use the "langkit" namespace
 helm template --namespace langkit langkit .
 ```
 
 ### Diff
+View the difference between the current state and desired state.
+
 ```shell
 # Requires the helm-diff plugin to be installed:
 # helm plugin install https://github.com/databus23/helm-diff
-helm diff \
+helm diff upgrade \
+  --allow-unreleased \
   `# do not create namespace if it already exists` \
   --set namespace.create=false \
-  --namespace langkit2 \
-  --allow-unreleased \
-  upgrade \
-  langkit langkit-0.1.0.tgz
+  --namespace langkit \
+  langkit langkit-0.2.0.tgz
 ```
 
 ### Install/Update
 ```shell
-helm upgrade \
+helm upgrade --install \
   `# do not create namespace if it already exists` \
   --set namespace.create=false \
   --namespace langkit \
-  --install \
-  langkit langkit-0.1.0.tgz
+  langkit langkit-0.2.0.tgz
 ```
 
 ### Uninstall
@@ -70,16 +72,15 @@ helm-docs --dry-run
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].key | string | `"app.kubernetes.io/name"` |  |
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].operator | string | `"In"` |  |
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].values[0] | string | `"langkit"` |  |
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
 | fullnameOverride | string | `""` |  |
+| image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"whylabs/whylogs"` |  |
 | image.tag | string | `"py-llm-latest"` |  |
 | imagePullSecrets | list | `[]` |  |
+| livenessProbe.initialDelaySeconds | int | `15` |  |
+| livenessProbe.periodSeconds | int | `10` |  |
+| livenessProbe.tcpSocket.port | int | `8000` |  |
 | nameOverride | string | `""` |  |
 | namespace.create | bool | `true` |  |
 | namespace.name | string | `nil` |  |
@@ -87,15 +88,18 @@ helm-docs --dry-run
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| readinessProbe.initialDelaySeconds | int | `15` |  |
+| readinessProbe.periodSeconds | int | `10` |  |
+| readinessProbe.tcpSocket.port | int | `8000` |  |
 | replicaCount | int | `3` |  |
 | resources.limits.cpu | string | `"8"` |  |
 | resources.limits.memory | string | `"16Gi"` |  |
 | resources.requests.cpu | string | `"4"` |  |
 | resources.requests.memory | string | `"8Gi"` |  |
-| secrets.langkitApiSecret | string | `"langkit-api-secret"` | from-literal=LANGKIT_API_KEY=<langkit-api-key> |
-| secrets.whylabsApiKey | string | `"whylabs-api-key"` | from-literal=WHYLABS_API_KEY=<whylabs-api-key> |
+| secrets.langkitApiSecret | object | `{"name":"langkit-api-secret"}` | |
+| secrets.whylabsApiKey | object | `{"name":"whylabs-api-key"}` | |
 | securityContext | object | `{}` |  |
-| service.port | int | `8000` |  |
+| service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.automount | bool | `true` |  |
