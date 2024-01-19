@@ -36,9 +36,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.port }}
-              protocol: TCP
+            - containerPort: {{ .Values.image.containerPort }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -47,9 +45,9 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           envFrom:
             - secretRef:
-                name: {{ .Values.secrets.whylabsApiKey }}
+                name: {{ .Values.secrets.whylabsApiKey.name }}
             - secretRef:
-                name: {{ .Values.secrets.langkitApiSecret }}
+                name: {{ .Values.secrets.langkitApiSecret.name }}
           {{- with .Values.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
