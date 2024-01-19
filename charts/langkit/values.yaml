@@ -9,6 +9,7 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: py-llm-latest
+  containerPort: 8000
 
 imagePullSecrets: []
 nameOverride: ""
@@ -43,15 +44,17 @@ secrets:
   # kubectl create secret generic langkit-api-secret \
   # --namespace=langkit \
   # --from-literal=WHYLABS_API_KEY=<whylabs-api-key>
-  whylabsApiKey: whylabs-api-key
+  whylabsApiKey: 
+    name: whylabs-api-key
   # kubectl create secret generic langkit-api-secret \
   # --namespace=langkit \
   # --from-literal=LANGKIT_API_KEY=<langkit-api-key>
-  langkitApiSecret: langkit-api-secret
+  langkitApiSecret:
+    name: langkit-api-secret
 
 service:
   type: ClusterIP
-  port: 8000
+  port: 80
 
 resources:
   requests:
@@ -61,14 +64,16 @@ resources:
     cpu: "8"
     memory: 16Gi
 
-# livenessProbe:
-#   httpGet:
-#     path: /health
-#     port: http
-# readinessProbe:
-#   httpGet:
-#     path: /health
-#     port: http
+livenessProbe:
+  tcpSocket:
+    port: 8000
+  initialDelaySeconds: 15
+  periodSeconds: 10
+readinessProbe:
+  tcpSocket:
+    port: 8000
+  initialDelaySeconds: 15
+  periodSeconds: 10
 
 nodeSelector: {}
 

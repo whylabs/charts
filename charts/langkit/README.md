@@ -23,9 +23,7 @@ kubectl create secret generic langkit-api-secret \
 ### Template
 ```shell
 # This will use the "langkit" namespace
-helm template \
-  --namespace langkit \
-  langkit .
+helm template --namespace langkit langkit .
 ```
 
 ### Diff
@@ -35,10 +33,10 @@ helm template \
 helm diff \
   `# do not create namespace if it already exists` \
   --set namespace.create=false \
-  --namespace langkit \
+  --namespace langkit2 \
   --allow-unreleased \
   upgrade \
-  langkit .
+  langkit langkit-0.1.0.tgz
 ```
 
 ### Install/Update
@@ -48,7 +46,7 @@ helm upgrade \
   --set namespace.create=false \
   --namespace langkit \
   --install \
-  langkit .
+  langkit langkit-0.1.0.tgz
 ```
 
 ### Uninstall
