@@ -1,0 +1,37 @@
+name: Publish Helm Chart
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+
+      - name: Package Helm Chart
+        working-directory: ${{ github.workspace }}
+        run: |
+          helm package charts/langkit
+
+      - name: Login to GHCR
+        run: |
+          docker login ghcr.io \
+            -u ${{ github.repository_owner }} \
+            --password-stdin < <(echo "${{ secrets.GITHUB_TOKEN }}")
+
+      - name: Publish Helm Chart to GHCR
+        id: chart
+        run: |
+          chart_version=$(grep 'version:' ./charts/langkit/Chart.yaml | tail -n1 | awk '{ print $2}')
+          ghcr_chart="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${chart_version}"
+          helm push "langkit-${chart_version}".tgz oci://ghcr.io/${{ github.repository_owner }}      
+          
