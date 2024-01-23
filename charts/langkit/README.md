@@ -1,12 +1,18 @@
-# langkit
+# LangKit Helm Chart
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square)
+![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![AppVersion: 1.16.0](https://img.shields.io/badge/AppVersion-1.16.0-informational?style=flat-square)
+
+> :warning: Review the [documentation on using WhyLab's Helm charts](../../README.md#how-to-use-whylabs-helm-repository)
 
 ## Prerequisites
 
 ### Credentials
 
-The following Kubernetes `Secrets` must exist in the cluster prior to installing this Helm chart: `whylabs-api-secret` and `langkit-api-secret`. The following commands can be used to create the `Secrets` within the cluster.
+The following Kubernetes `Secrets` must exist in the cluster prior to installing
+this Helm chart: `whylabs-api-secret` and `langkit-api-secret`. The following
+commands can be used to create the `Secrets` within the cluster.
 
 ```shell
 kubectl create secret generic whylabs-api-secret \
@@ -62,7 +68,8 @@ helm uninstall \
 
 ### Generate Values Table
 
-The following command will output the [Values table](#values) below. Copy and paste the table into this `README.md` file whenever this chart changes.
+The following command will output the [Values table](#values) below. Copy and
+paste the table into this `README.md` file whenever this chart changes.
 
 ```shell
 helm-docs --dry-run
@@ -78,6 +85,13 @@ helm-docs --dry-run
 | image.repository | string | `"whylabs/whylogs"` |  |
 | image.tag | string | `"py-llm-latest"` |  |
 | imagePullSecrets | list | `[]` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.className | string | `""` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.hosts[0].host | string | `"chart-example.local"` |  |
+| ingress.hosts[0].paths[0].path | string | `"/"` |  |
+| ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
+| ingress.tls | list | `[]` |  |
 | livenessProbe.initialDelaySeconds | int | `15` |  |
 | livenessProbe.periodSeconds | int | `10` |  |
 | livenessProbe.tcpSocket.port | int | `8000` |  |
@@ -96,8 +110,8 @@ helm-docs --dry-run
 | resources.limits.memory | string | `"16Gi"` |  |
 | resources.requests.cpu | string | `"4"` |  |
 | resources.requests.memory | string | `"8Gi"` |  |
-| secrets.langkitApiSecret | object | `{"name":"langkit-api-secret"}` | |
-| secrets.whylabsApiKey | object | `{"name":"whylabs-api-key"}` | |
+| secrets.langkitApiSecret.name | string | `"langkit-api-secret"` |  |
+| secrets.whylabsApiKey.name | string | `"whylabs-api-key"` |  |
 | securityContext | object | `{}` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
