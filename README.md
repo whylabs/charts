@@ -2,13 +2,13 @@
 
 ## How to Use WhyLabs Helm Repository
 
-> WhyLab's Helm charts are currently hosted on the GitHub Container Registry
-> (GHCR), an OCI-compliant storage solution. While GHCR differs from traditional
-> Helm repositories by not providing an index.yaml file for chart listings, it
-> aligns with industry standards for container artifact storage. As we explore
-> more comprehensive repository solutions, please use the `helm pull` command,
-> followed by specifying the chart's .tgz file, to access and utilize our Helm
-> charts.
+> :warning: WhyLab's Helm charts are currently hosted on the GitHub Container
+> Registry (GHCR), an OCI-compliant storage solution. While GHCR differs from
+> traditional Helm repositories by not providing an index.yaml file for chart
+> listings, it aligns with industry standards for container artifact storage. As
+> we exploremore comprehensive repository solutions, please use the `helm pull`
+> command,followed by specifying the chart's .tgz file, to access and utilize
+> our Helm charts.
 
 ### Example Using the [LangKit Helm Chart](./charts/langkit/)
 
