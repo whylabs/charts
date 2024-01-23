@@ -1,11 +1,21 @@
 # Helm Charts for WhyLabs
 
-## How to use WhyLabs Helm repository
+## How to Use WhyLabs Helm Repository
+
+> :warning: WhyLab's Helm charts are currently hosted on the GitHub Container
+> Registry (GHCR), an OCI-compliant storage solution. While GHCR differs from
+> traditional Helm repositories by not providing an index.yaml file for chart
+> listings, it aligns with industry standards for container artifact storage. As
+> we exploremore comprehensive repository solutions, please use the `helm pull`
+> command,followed by specifying the chart's .tgz file, to access and utilize
+> our Helm charts.
 
 ### Example Using the [LangKit Helm Chart](./charts/langkit/)
 
 #### Quick Start
+WhyLab's Helm charts are stored in an OCI repository 
 ```shell
+# Downloads a .tgz file to the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/langkit \
   --version "0.2.0"
@@ -15,6 +25,7 @@ helm diff upgrade \
   `# set namespace.create to false if the target namespace already exists` \
   --set namespace.create=false \
   --namespace langkit \
+  `# Specify the .tgz file as the chart` \
   langkit langkit-0.2.0.tgz
 
 helm upgrade --install \
@@ -44,11 +55,11 @@ helm pull \
 
 # Performs a diff between current and proposed state
 # --allow-unreleased flag will perform a diff even if there is no current state,
-# i.e. a fresh installation will display all net new resource creation in the diff.
-# --set namespace.create=false must be set if target namespace already exists;
-# omit this line or set it to "true" if the target namespace should be created.
-# Requires the helm-diff plugin to be installed:
-# helm plugin install https://github.com/databus23/helm-diff
+# i.e. a fresh installation will display all net new resource creation in the
+# diff. --set namespace.create=false must be set if target namespace already
+# exists; omit this line or set it to "true" if the target namespace should be
+# created. Requires the helm-diff plugin to be installed:
+# `helm plugin install https://github.com/databus23/helm-diff`
 helm diff upgrade \
   --allow-unreleased \
   `# set namespace.create to false if the target namespace already exists` \
@@ -57,9 +68,9 @@ helm diff upgrade \
   "${release}" "${chart}"
 
 # helm upgrade --install supports installation and upgrades.
-# In the `helm upgrade --install <release-name> <chart>` command, the chart may be
-# a chart reference('example/postgres'), a path to a chart directory, a fully qualified
-# URL, or a packaged chart (which is what this example uses)
+# In the `helm upgrade --install <release-name> <chart>` command, the chart may
+# be a chart reference('example/postgres'), a path to a chart directory, a fully
+# qualified URL, or a packaged chart (.tgz), which is what this example uses.
 helm upgrade --install \
   `# set namespace.create to false if the target namespace already exists` \
   --set namespace.create=false \
