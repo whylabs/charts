@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning]
 
 ## [0.4.0] - **Breaking Changes** - 2023-01-26
 
+### Added
+
+- `readOnlyRootFilesystem` is set to `true` by default.
+- Added two volumes to allow writes at specific paths.
+
 ### Breaking
 
 - :warning: Removed `Namespace` management by this Helm chart in accordance with
