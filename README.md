@@ -4,7 +4,7 @@
 
 > :warning: WhyLab's Helm charts are currently hosted on the GitHub Container
 > Registry (GHCR), an OCI-compliant storage solution. While GHCR differs from
-> traditional Helm repositories by not providing an `index.yaml`` file for chart
+> traditional Helm repositories by not providing an `index.yaml` file for chart
 > listings, it aligns with industry standards for container artifact storage. As
 > we explore more comprehensive repository solutions, please use the `helm pull`
 > command, followed by specifying the chart's `.tgz` file, to access and utilize
@@ -37,7 +37,7 @@ helm upgrade --install \
 # Configure local variables for clarity and simplicity
 helm_repo="ghcr.io/whylabs"
 chart_name="langkit"
-chart_version="0.3.0"
+chart_version="0.4.0"
 chart="${chart_name}-${chart_version}.tgz"
 
 # Release and namespace values mirror other variables for simplicity.
