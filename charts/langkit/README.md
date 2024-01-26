@@ -11,17 +11,17 @@
 ### Credentials
 
 The following Kubernetes `Secrets` must exist in the cluster prior to installing
-this Helm chart: `whylabs-api-secret` and `langkit-api-secret`. The following
+this Helm chart: `whylabs-api-key` and `langkit-api-secret`. The following
 commands can be used to create the `Secrets` within the cluster.
 
 ```shell
-kubectl create secret generic whylabs-api-secret \
+kubectl create secret generic whylabs-api-key \
   --namespace=langkit \
   --from-literal=WHYLABS_API_KEY=<whylabs-api-key>
 
 kubectl create secret generic langkit-api-secret \
   --namespace=langkit \
-  --from-literal=CONTAINER_PASSWORD=<langkit-api-key>
+  --from-literal=CONTAINER_PASSWORD=<langkit-api-secret>
 ```
 
 ## Usage

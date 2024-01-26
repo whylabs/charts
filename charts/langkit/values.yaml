@@ -41,14 +41,14 @@ securityContext:
   # runAsUser: 1000
 
 secrets:
-  # kubectl create secret generic langkit-api-secret \
+  # kubectl create secret generic whylabs-api-key \
   # --namespace=langkit \
   # --from-literal=WHYLABS_API_KEY=<whylabs-api-key>
   whylabsApiKey: 
     name: whylabs-api-key
   # kubectl create secret generic langkit-api-secret \
   # --namespace=langkit \
-  # --from-literal=CONTAINER_PASSWORD=<langkit-api-key>
+  # --from-literal=CONTAINER_PASSWORD=<llangkit-api-secret>
   langkitApiSecret:
     name: langkit-api-secret
 
