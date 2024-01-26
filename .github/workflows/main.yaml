@@ -3,11 +3,11 @@ name: Publish Helm Chart
 on:
   push:
     branches:
-      - main
+      - mainline
 
   pull_request:
     branches:
-      - main
+      - mainline
 
 jobs:
   publish:
