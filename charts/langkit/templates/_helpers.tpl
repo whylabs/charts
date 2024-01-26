@@ -49,14 +49,3 @@ Selector labels
 app.kubernetes.io/name: langkit
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "langkit.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "langkit.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}

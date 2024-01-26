@@ -4,35 +4,32 @@
 
 > :warning: WhyLab's Helm charts are currently hosted on the GitHub Container
 > Registry (GHCR), an OCI-compliant storage solution. While GHCR differs from
-> traditional Helm repositories by not providing an index.yaml file for chart
+> traditional Helm repositories by not providing an `index.yaml` file for chart
 > listings, it aligns with industry standards for container artifact storage. As
-> we exploremore comprehensive repository solutions, please use the `helm pull`
-> command,followed by specifying the chart's .tgz file, to access and utilize
+> we explore more comprehensive repository solutions, please use the `helm pull`
+> command, followed by specifying the chart's `.tgz` file, to access and utilize
 > our Helm charts.
 
 ### Example Using the [LangKit Helm Chart](./charts/langkit/)
 
 #### Quick Start
-WhyLab's Helm charts are stored in an OCI repository 
+
 ```shell
 # Downloads a .tgz file to the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/langkit \
-  --version "0.2.0"
+  --version "0.4.0"
 
 helm diff upgrade \
   --allow-unreleased \
-  `# set namespace.create to false if the target namespace already exists` \
-  --set namespace.create=false \
   --namespace langkit \
   `# Specify the .tgz file as the chart` \
-  langkit langkit-0.2.0.tgz
+  langkit langkit-0.4.0.tgz
 
 helm upgrade --install \
-  `# set namespace.create to false if the target namespace already exists` \
-  --set namespace.create=false \
+  --create-namespace \
   --namespace langkit \
-  langkit langkit-0.2.0.tgz
+  langkit langkit-0.4.0.tgz
 ```
 
 #### Extended Example
@@ -40,7 +37,7 @@ helm upgrade --install \
 # Configure local variables for clarity and simplicity
 helm_repo="ghcr.io/whylabs"
 chart_name="langkit"
-chart_version="0.2.0"
+chart_version="0.4.0"
 chart="${chart_name}-${chart_version}.tgz"
 
 # Release and namespace values mirror other variables for simplicity.
@@ -62,8 +59,6 @@ helm pull \
 # `helm plugin install https://github.com/databus23/helm-diff`
 helm diff upgrade \
   --allow-unreleased \
-  `# set namespace.create to false if the target namespace already exists` \
-  --set namespace.create=false \
   --namespace "${namespace}" \
   "${release}" "${chart}"
 
@@ -72,8 +67,7 @@ helm diff upgrade \
 # be a chart reference('example/postgres'), a path to a chart directory, a fully
 # qualified URL, or a packaged chart (.tgz), which is what this example uses.
 helm upgrade --install \
-  `# set namespace.create to false if the target namespace already exists` \
-  --set namespace.create=false \
+  --create-namespace \
   --namespace "${namespace}" \
   "${release}" "${chart}"
 

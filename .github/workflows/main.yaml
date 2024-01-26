@@ -1,35 +1,63 @@
-name: Publish Helm Chart
+name: Helm Chart Workflow
 
 on:
   push:
     branches:
-      - main
+      - mainline
+
   pull_request:
+    branches:
+      - mainline
 
 jobs:
-  publish:
+  Helm:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Helm
         uses: azure/setup-helm@v3
+        with:
+          version: v3.14.0
+
+      # - name: Output Template
+      #   if: github.event_name == 'pull_request'
+      #   run: |
+      #     changed_files=($(git diff --name-only mainline...${{ github.head_ref }} | grep '^charts/' | cut -d'/' -f1,2 | uniq))
+
+      #     for chart in "${changed_files[@]}"
+      #     do
+      #       if [ -d "${chart}" ]; then
+      #         (
+      #           cd "${chart}"
+      #           echo "Generating template for ${chart}"
+              
+      #           helm template \
+      #             --namespace "${chart}" \
+      #             "${chart}" .
+      #         )
+      #       fi
+      #     done
 
       - name: Package Helm Chart
+        if: github.event_name == 'push'
         working-directory: ${{ github.workspace }}
         run: |
           helm package charts/langkit
 
       - name: Login to GHCR
+        if: github.event_name == 'push'
         run: |
           docker login ghcr.io \
             -u ${{ github.repository_owner }} \
             --password-stdin < <(echo "${{ secrets.GITHUB_TOKEN }}")
 
       - name: Publish Helm Chart to GHCR
-        id: chart
+        if: github.event_name == 'push'
         run: |
           chart_version=$(grep 'version:' ./charts/langkit/Chart.yaml | tail -n1 | awk '{ print $2}')
           ghcr_chart="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}:${chart_version}"
