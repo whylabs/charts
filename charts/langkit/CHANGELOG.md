@@ -6,7 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning]
 (https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.0] - **Breaking Changes** - 2023-01-26
+
+### Breaking
+
+- :warning: Removed `Namespace` management by this Helm chart in accordance with
+  best practices. If deploying into a `Namespace` that does not exist, you must
+  include the `--create-namespace` flag.
+
+### Fixed
+
+- The documentation for the `langkit-api-secret` secret incorrectly specifies
+  the key ``--from-literal=LANGKIT_API_KEY=<langkit-api-key>`. The correct
+  configuration for the secret is
+  `--from-literal=CONTAINER_PASSWORD=<langkit-api-key>`. 
+
+### Removed
+
+- `ServiceAccount` is not required by LangKit at this time.
 
 ## [0.3.0] - 2024-01-23
 

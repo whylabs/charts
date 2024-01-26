@@ -1,14 +1,9 @@
-namespace:
-  create: true
-  name:
-
 replicaCount: 3
 
 image:
   repository: whylabs/whylogs
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: py-llm-latest
+  tag: py-llm-1.0.1
   containerPort: 8000
 
 imagePullSecrets: []
@@ -31,24 +26,13 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: false
-  # Automatically mount a ServiceAccount's API credentials?
-  automount: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
 podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
   # capabilities:
   #   drop:
   #   - ALL
@@ -64,7 +48,7 @@ secrets:
     name: whylabs-api-key
   # kubectl create secret generic langkit-api-secret \
   # --namespace=langkit \
-  # --from-literal=LANGKIT_API_KEY=<langkit-api-key>
+  # --from-literal=CONTAINER_PASSWORD=<langkit-api-key>
   langkitApiSecret:
     name: langkit-api-secret
 
@@ -111,3 +95,11 @@ affinity:
                 operator: In
                 values:
                   - langkit
+
+volumes: []
+  # - name: temp-dir
+  #   emptyDir: {}
+  
+volumeMounts: []
+  # - name: temp-dir
+  #   mountPath: /tmp
