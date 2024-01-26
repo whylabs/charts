@@ -8,23 +8,24 @@
 
 ## Prerequisites
 
-### Credentials
-
-Retrieve or [Create WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-capabilities/#access-token-management)
-which must be stored in a `whylabs-api-key` Kubernetes secret, described below.
-
-Generate a random value for the `langkit-api-secret` Kubernetes secret, also
-described below. This is required to call into the container.
-
-Use the the following commands to create the secrets in your Kubernets cluster.
-Change the `--namespace` value if you will be deploying into a namespace other
+NOTE: Change the `--namespace` value if you will be deploying into a namespace other
 than `langkit`.
+
+
+### Credentials
+* Create a [WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-capabilities/#access-token-management)
+which must be stored in a `whylabs-api-key` Kubernetes secret, described below.
 
 ```shell
 kubectl create secret generic whylabs-api-key \
   --namespace=langkit \
   --from-literal=WHYLABS_API_KEY=<whylabs-api-key>
+```
 
+* Generate a random value for the `langkit-api-secret` Kubernetes secret, also
+described below. **This secret is required to call the container API endpoint**.
+
+```
 kubectl create secret generic langkit-api-secret \
   --namespace=langkit \
   --from-literal=CONTAINER_PASSWORD=<langkit-api-secret>
@@ -32,9 +33,9 @@ kubectl create secret generic langkit-api-secret \
 
 ### LangKit Configuration
 
-Review the [langkit-container-examples](https://github.com/whylabs/langkit-container-examples)
-repository for information and documentation around custom `LangKit`
-configurations.
+No LangKit configurations are required out of the box. However, for further customizations, 
+review the [langkit-container-examples](https://github.com/whylabs/langkit-container-examples)
+repository for more details.
 
 ## Helm Chart Installation
 
