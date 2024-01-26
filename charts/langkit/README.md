@@ -10,8 +10,11 @@
 
 ### Credentials
 
-Retrieve or [Create access tokens](https://docs.whylabs.ai/docs/whylabs-capabilities/#access-token-management)
-which must be stored in Kubernetes `Secrets`.
+Retrieve or [Create WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-capabilities/#access-token-management)
+which must be stored in a `whylabs-api-key` Kubernetes secret, described below.
+
+Generate a random value for the `langkit-api-secret` Kubernetes secret, also
+described below. This is required to call into the container.
 
 Use the the following commands to create the secrets in your Kubernets cluster.
 Change the `--namespace` value if you will be deploying into a namespace other
