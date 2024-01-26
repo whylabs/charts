@@ -3,7 +3,7 @@ replicaCount: 3
 image:
   repository: whylabs/whylogs
   pullPolicy: IfNotPresent
-  tag: py-llm-1.0.1
+  tag: py-llm-1.0.2.dev0
   containerPort: 8000
 
 imagePullSecrets: []

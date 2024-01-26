@@ -10,9 +10,12 @@
 
 ### Credentials
 
-The following Kubernetes `Secrets` must exist in the cluster prior to installing
-this Helm chart: `whylabs-api-key` and `langkit-api-secret`. The following
-commands can be used to create the `Secrets` within the cluster.
+Retrieve or [Create access tokens](https://docs.whylabs.ai/docs/whylabs-capabilities/#access-token-management)
+which must be stored in Kubernetes `Secrets`.
+
+Use the the following commands to create the secrets in your Kubernets cluster.
+Change the `--namespace` value if you will be deploying into a namespace other
+than `langkit`.
 
 ```shell
 kubectl create secret generic whylabs-api-key \
@@ -24,7 +27,13 @@ kubectl create secret generic langkit-api-secret \
   --from-literal=CONTAINER_PASSWORD=<langkit-api-secret>
 ```
 
-## Usage
+### LangKit Configuration
+
+Review the [langkit-container-examples]
+(https://github.com/whylabs/langkit-container-examples) repository for
+information and documentation around custom `LangKit` configurations.
+
+## Helm Chart Installation
 
 ### Template
 Display the full YAML manifests as they will be applied.
@@ -78,7 +87,7 @@ helm-docs --dry-run
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"whylabs/whylogs"` |  |
-| image.tag | string | `"py-llm-1.0.1"` |  |
+| image.tag | string | `"py-llm-1.0.2.dev0"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
