@@ -29,9 +29,9 @@ kubectl create secret generic langkit-api-secret \
 
 ### LangKit Configuration
 
-Review the [langkit-container-examples]
-(https://github.com/whylabs/langkit-container-examples) repository for
-information and documentation around custom `LangKit` configurations.
+Review the [langkit-container-examples](https://github.com/whylabs/langkit-container-examples)
+repository for information and documentation around custom `LangKit`
+configurations.
 
 ## Helm Chart Installation
 
