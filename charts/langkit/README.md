@@ -21,7 +21,7 @@ kubectl create secret generic whylabs-api-secret \
 
 kubectl create secret generic langkit-api-secret \
   --namespace=langkit \
-  --from-literal=LANGKIT_API_KEY=<langkit-api-key>
+  --from-literal=CONTAINER_PASSWORD=<langkit-api-key>
 ```
 
 ## Usage
