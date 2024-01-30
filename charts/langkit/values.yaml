@@ -3,7 +3,7 @@ replicaCount: 3
 image:
   repository: whylabs/whylogs
   pullPolicy: IfNotPresent
-  tag: py-llm-1.0.2.dev0
+  tag: py-llm-1.0.2.dev1
   containerPort: 8000
 
 imagePullSecrets: []
@@ -77,11 +77,11 @@ readinessProbe:
 
 nodeSelector: {}
 
-tolerations:
-  - effect: NoSchedule
-    key: kubernetes.azure.com/scalesetpriority
-    operator: Equal
-    value: spot
+tolerations: []
+  # - effect: NoSchedule
+  #   key: kubernetes.azure.com/scalesetpriority
+  #   operator: Equal
+  #   value: spot
 
 affinity:
   podAntiAffinity:

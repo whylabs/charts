@@ -122,10 +122,7 @@ helm-docs --dry-run
 | securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
-| tolerations[0].effect | string | `"NoSchedule"` |  |
-| tolerations[0].key | string | `"kubernetes.azure.com/scalesetpriority"` |  |
-| tolerations[0].operator | string | `"Equal"` |  |
-| tolerations[0].value | string | `"spot"` |  |
+| tolerations | list | `[]` |  |
 | volumeMounts[0].mountPath | string | `"/tmp"` |  |
 | volumeMounts[0].name | string | `"temp-dir"` |  |
 | volumeMounts[1].mountPath | string | `"/root/.config"` |  |
