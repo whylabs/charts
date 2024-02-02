@@ -22,7 +22,7 @@ ingress:
 image:
   repository: whylabs/whylogs
   pullPolicy: Always
-  tag: py-llm-1.0.2.dev1
+  tag: py-llm-1.0.2.dev2
   containerPort: 8000
 
 imagePullSecrets: []
