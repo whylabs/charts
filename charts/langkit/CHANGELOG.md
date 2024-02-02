@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning]
 - Added an `initContainer`
 - Added support for configuring container environment variables
 
+### Removed
+
+- Removed default `root-config` volume and volume mount
+
 ## [0.5.0] - 2023-01-30
 
 ### Changed

@@ -52,8 +52,6 @@ containers:
   volumeMounts:
     - name: temp-dir
       mountPath: /tmp
-    - name: root-config
-      mountPath: /root/.config
     - name: home
       mountPath: /home
 
@@ -89,8 +87,6 @@ secrets:
   langkitApiSecret:
     name: langkit-api-secret
 
-
-
 livenessProbe:
   tcpSocket:
     port: 8000
@@ -125,8 +121,6 @@ affinity:
 
 volumes:
   - name: temp-dir
-    emptyDir: {}
-  - name: root-config
     emptyDir: {}
   - name: home
     emptyDir: {}
