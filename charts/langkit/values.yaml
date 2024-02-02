@@ -58,8 +58,6 @@ containers:
 initContainers:
   command: ["sh", "-c", "cp -R /opt/whylogs-container/.cache /home/"]
   volumeMounts:
-    - name: root-config
-      mountPath: /root/.config
     - name: home
       mountPath: /home
 
