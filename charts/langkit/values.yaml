@@ -1,12 +1,5 @@
 replicaCount: 3
 
-image:
-  repository: whylabs/whylogs
-  pullPolicy: IfNotPresent
-  tag: py-llm-1.0.2.dev1
-  containerPort: 8000
-
-imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
@@ -26,31 +19,47 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-podAnnotations: {}
-podLabels: {}
+image:
+  repository: whylabs/whylogs
+  pullPolicy: Always
+  tag: py-llm-1.0.2.dev2
+  containerPort: 8000
 
-podSecurityContext: {}
-  # fsGroup: 2000
+imagePullSecrets: []
 
-securityContext:
-  readOnlyRootFilesystem: true
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # runAsNonRoot: true
-  # runAsUser: 1000
+pod:
+  annotations: {}
+  labels: {}
+  securityContext: {}
+    # fsGroup: 2000
+    # runAsNonRoot: true
+    # runAsUser: 1000
 
-secrets:
-  # kubectl create secret generic whylabs-api-key \
-  # --namespace=langkit \
-  # --from-literal=WHYLABS_API_KEY=<whylabs-api-key>
-  whylabsApiKey: 
-    name: whylabs-api-key
-  # kubectl create secret generic langkit-api-secret \
-  # --namespace=langkit \
-  # --from-literal=CONTAINER_PASSWORD=<llangkit-api-secret>
-  langkitApiSecret:
-    name: langkit-api-secret
+containers:
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsUser: 1000
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # runAsNonRoot: true
+    # runAsUser: 1000
+  env:
+    - name: HOME
+      value: "/home"
+    - name: HF_HOME
+      value: "/home/.cache/hf_home"
+  volumeMounts:
+    - name: temp-dir
+      mountPath: /tmp
+    - name: home
+      mountPath: /home
+
+initContainers:
+  command: ["sh", "-c", "cp -R /opt/whylogs-container/.cache /home/"]
+  volumeMounts:
+    - name: home
+      mountPath: /home
 
 service:
   type: ClusterIP
@@ -63,6 +72,18 @@ resources:
   limits:
     cpu: "8"
     memory: 16Gi
+    
+secrets:
+  # kubectl create secret generic whylabs-api-key \
+  # --namespace=langkit \
+  # --from-literal=WHYLABS_API_KEY=<whylabs-api-key>
+  whylabsApiKey: 
+    name: whylabs-api-key
+  # kubectl create secret generic langkit-api-secret \
+  # --namespace=langkit \
+  # --from-literal=CONTAINER_PASSWORD=<llangkit-api-secret>
+  langkitApiSecret:
+    name: langkit-api-secret
 
 livenessProbe:
   tcpSocket:
@@ -99,11 +120,5 @@ affinity:
 volumes:
   - name: temp-dir
     emptyDir: {}
-  - name: root-config
+  - name: home
     emptyDir: {}
-  
-volumeMounts:
-  - name: temp-dir
-    mountPath: /tmp
-  - name: root-config
-    mountPath: /root/.config

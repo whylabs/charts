@@ -11,13 +11,13 @@ spec:
       {{- include "langkit.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with .Values.pod.annotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "langkit.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
+        {{- with .Values.pod.labels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -26,11 +26,23 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.pod.securityContext | nindent 8 }}
+      initContainers:
+        - name: init
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.containers.securityContext | nindent 12 }}
+          command:
+            {{- toYaml .Values.initContainers.command | nindent 12 }}
+          {{- with .Values.initContainers.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.containers.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -41,12 +53,14 @@ spec:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            {{- toYaml .Values.containers.env | nindent 12 }}
           envFrom:
             - secretRef:
                 name: {{ .Values.secrets.whylabsApiKey.name }}
             - secretRef:
                 name: {{ .Values.secrets.langkitApiSecret.name }}
-          {{- with .Values.volumeMounts }}
+          {{- with .Values.containers.volumeMounts }}
           volumeMounts:
             {{- toYaml . | nindent 12 }}
           {{- end }}

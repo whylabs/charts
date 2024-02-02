@@ -6,6 +6,27 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning]
 (https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - **Breaking Changes** - 2023-02-01
+
+### Breaking
+
+- :warning: changed the structure of the `values.yaml` file for better
+  organization with the introduction of an init container and running as a
+  non-root user by default
+
+### Changed
+
+- Updated the `securityContext` to run the container as a non-root user
+
+### Added
+
+- Added an `initContainer`
+- Added support for configuring container environment variables
+
+### Removed
+
+- Removed default `root-config` volume and volume mount
+
 ## [0.5.0] - 2023-01-30
 
 ### Changed
