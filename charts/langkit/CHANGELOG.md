@@ -11,7 +11,12 @@ and this project adheres to [Semantic Versioning]
 ### Breaking
 
 - :warning: changed the structure of the `values.yaml` file for better
-  organization with the introduction of an init container.
+  organization with the introduction of an init container and running as a
+  non-root user by default
+
+### Changed
+
+- Updated the `securityContext` to run the container as a non-root user
 
 ### Added
 
