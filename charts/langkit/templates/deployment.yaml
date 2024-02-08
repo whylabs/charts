@@ -55,6 +55,10 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             {{- toYaml .Values.containers.env | nindent 12 }}
+            {{- range .Values.models }}
+            - name: {{ .name | upper | replace "-" "_" }}_SERVICE_URL
+              value: "http://{{ .name }}.{{ $.Release.Namespace }}.svc.cluster.local"
+            {{- end }}
           envFrom:
             - secretRef:
                 name: {{ .Values.secrets.whylabsApiKey.name }}
