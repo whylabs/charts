@@ -122,3 +122,38 @@ volumes:
     emptyDir: {}
   - name: home
     emptyDir: {}
+
+models:
+  - name: model1
+    image: nginx
+    ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 80
+    tolerations:
+      - effect: NoSchedule
+        key: kubernetes.azure.com/scalesetpriority
+        operator: Equal
+        value: spot
+  - name: model2
+    image: nginx
+    ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 80
+    tolerations:
+      - effect: NoSchedule
+        key: kubernetes.azure.com/scalesetpriority
+        operator: Equal
+        value: spot
+  - name: model3
+    image: nginx
+    ports:
+      - protocol: TCP
+        port: 80
+        targetPort: 80
+    tolerations:
+      - effect: NoSchedule
+        key: kubernetes.azure.com/scalesetpriority
+        operator: Equal
+        value: spot
