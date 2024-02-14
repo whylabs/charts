@@ -3,17 +3,26 @@ replicaCount: 3
 nameOverride: ""
 fullnameOverride: ""
 
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Automatically mount a ServiceAccount's API credentials?
+  automount: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
 ingress:
   enabled: false
   className: ""
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+  hosts: []
+  #   - host: chart-example.local
+  #     paths:
+  #       - path: /
+  #         pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:
@@ -36,6 +45,7 @@ pod:
     # runAsUser: 1000
 
 containers:
+  # containers.securityContext -- (object) Container security context
   securityContext:
     readOnlyRootFilesystem: true
     runAsUser: 1000
@@ -44,11 +54,13 @@ containers:
     #   - ALL
     # runAsNonRoot: true
     # runAsUser: 1000
+  # containers.env -- (list) Environment variables for the containers
   env:
     - name: HOME
       value: "/home"
     - name: HF_HOME
       value: "/home/.cache/hf_home"
+  # containers.volumeMounts -- (list) Volume mounts for containers
   volumeMounts:
     - name: temp-dir
       mountPath: /tmp
@@ -56,7 +68,9 @@ containers:
       mountPath: /home
 
 initContainers:
+  # initContainers.command -- (list) Command for init container
   command: ["sh", "-c", "cp -R /opt/whylogs-container/.cache /home/"]
+  # initContainers.volumeMounts -- (list) Volume mounts for init container
   volumeMounts:
     - name: home
       mountPath: /home
@@ -74,15 +88,11 @@ resources:
     memory: 16Gi
     
 secrets:
-  # kubectl create secret generic whylabs-api-key \
-  # --namespace=langkit \
-  # --from-literal=WHYLABS_API_KEY=<whylabs-api-key>
-  whylabsApiKey: 
+  whylabsApiKey:
+    # -- Name of the secret that stores the WhyLabs API Key
     name: whylabs-api-key
-  # kubectl create secret generic langkit-api-secret \
-  # --namespace=langkit \
-  # --from-literal=CONTAINER_PASSWORD=<llangkit-api-secret>
   langkitApiSecret:
+    # -- Name of the secret that stores the WhyLabs LangKit API Secret
     name: langkit-api-secret
 
 livenessProbe:
@@ -104,6 +114,7 @@ tolerations: []
   #   operator: Equal
   #   value: spot
 
+# @ignored
 affinity:
   podAntiAffinity:
     preferredDuringSchedulingIgnoredDuringExecution:
@@ -117,6 +128,7 @@ affinity:
                 values:
                   - langkit
 
+# volumes -- (list) Volumes to create
 volumes:
   - name: temp-dir
     emptyDir: {}
