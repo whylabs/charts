@@ -18,18 +18,18 @@
 # Downloads a .tgz file to the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/langkit \
-  --version "0.4.0"
+  --version "0.7.0"
 
 helm diff upgrade \
   --allow-unreleased \
   --namespace langkit \
   `# Specify the .tgz file as the chart` \
-  langkit langkit-0.4.0.tgz
+  langkit langkit-0.7.0.tgz
 
 helm upgrade --install \
   --create-namespace \
   --namespace langkit \
-  langkit langkit-0.4.0.tgz
+  langkit langkit-0.7.0.tgz
 ```
 
 #### Extended Example
