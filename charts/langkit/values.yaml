@@ -31,7 +31,7 @@ ingress:
 image:
   repository: whylabs/whylogs
   pullPolicy: Always
-  tag: py-llm-1.0.2.dev4
+  tag: py-llm-1.0.2.dev6
   containerPort: 8000
 
 imagePullSecrets: []
@@ -56,10 +56,14 @@ containers:
     # runAsUser: 1000
   # containers.env -- (list) Environment variables for the containers
   env:
+    - name: TRANSFORMERS_OFFLINE
+      value: 1
+    - name: HF_DATASETS_OFFLINE
+      value: 1
     - name: HOME
-      value: "/home"
+      value: /home
     - name: HF_HOME
-      value: "/home/.cache/hf_home"
+      value: /home/.cache/hf_home
   # containers.volumeMounts -- (list) Volume mounts for containers
   volumeMounts:
     - name: temp-dir
