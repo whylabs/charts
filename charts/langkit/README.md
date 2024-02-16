@@ -55,7 +55,7 @@ View the difference between the current state and desired state.
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
-  langkit langkit-0.8.0.tgz
+  langkit langkit-0.9.0.tgz
 ```
 
 ### Install/Update
@@ -63,14 +63,14 @@ helm diff upgrade \
 helm upgrade --install \
   --create-namespace \
   --namespace langkit \
-  langkit langkit-0.8.0.tgz
+  langkit langkit-0.9.0.tgz
 ```
 
 ### Uninstall
 ```shell
 helm uninstall \
   --namespace langkit \
-  langkit langkit-0.8.0.tgz
+  langkit langkit-0.9.0.tgz
 ```
 
 ## Development
@@ -88,39 +88,22 @@ helm-docs --dry-run
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].key | string | `"app.kubernetes.io/name"` |  |
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].operator | string | `"In"` |  |
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.labelSelector.matchExpressions[0].values[0] | string | `"langkit"` |  |
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].podAffinityTerm.topologyKey | string | `"kubernetes.io/hostname"` |  |
-| affinity.podAntiAffinity.preferredDuringSchedulingIgnoredDuringExecution[0].weight | int | `100` |  |
-| containers.env[0].name | string | `"HOME"` |  |
-| containers.env[0].value | string | `"/home"` |  |
-| containers.env[1].name | string | `"HF_HOME"` |  |
-| containers.env[1].value | string | `"/home/.cache/hf_home"` |  |
-| containers.securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| containers.securityContext.runAsUser | int | `1000` |  |
-| containers.volumeMounts[0].mountPath | string | `"/tmp"` |  |
-| containers.volumeMounts[0].name | string | `"temp-dir"` |  |
-| containers.volumeMounts[1].mountPath | string | `"/home"` |  |
-| containers.volumeMounts[1].name | string | `"home"` |  |
+| containers.env | list | `[{"name":"TRANSFORMERS_OFFLINE","value":1},{"name":"HF_DATASETS_OFFLINE","value":1},{"name":"HOME","value":"/home"},{"name":"HF_HOME","value":"/home/.cache/hf_home"}]` | Environment variables for the containers |
+| containers.securityContext | object | `{"readOnlyRootFilesystem":true,"runAsUser":1000}` | Container security context |
+| containers.volumeMounts | list | `[{"mountPath":"/tmp","name":"temp-dir"},{"mountPath":"/home","name":"home"}]` | Volume mounts for containers |
 | fullnameOverride | string | `""` |  |
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"whylabs/whylogs"` |  |
-| image.tag | string | `"py-llm-1.0.2.dev4"` |  |
+| image.tag | string | `"py-llm-1.0.2.dev6"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths[0].path | string | `"/"` |  |
-| ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
+| ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
-| initContainers.command[0] | string | `"sh"` |  |
-| initContainers.command[1] | string | `"-c"` |  |
-| initContainers.command[2] | string | `"cp -R /opt/whylogs-container/.cache /home/"` |  |
-| initContainers.volumeMounts[0].mountPath | string | `"/home"` |  |
-| initContainers.volumeMounts[0].name | string | `"home"` |  |
+| initContainers.command | list | `["sh","-c","cp -R /opt/whylogs-container/.cache /home/"]` | Command for init container |
+| initContainers.volumeMounts | list | `[{"mountPath":"/home","name":"home"}]` | Volume mounts for init container |
 | livenessProbe.initialDelaySeconds | int | `15` |  |
 | livenessProbe.periodSeconds | int | `10` |  |
 | livenessProbe.tcpSocket.port | int | `8000` |  |
@@ -137,8 +120,8 @@ helm-docs --dry-run
 | resources.limits.memory | string | `"16Gi"` |  |
 | resources.requests.cpu | string | `"4"` |  |
 | resources.requests.memory | string | `"8Gi"` |  |
-| secrets.langkitApiSecret | object | `{"name":"langkit-api-secret"}` | from-literal=CONTAINER_PASSWORD=<llangkit-api-secret> |
-| secrets.whylabsApiKey | object | `{"name":"whylabs-api-key"}` | from-literal=WHYLABS_API_KEY=<whylabs-api-key> |
+| secrets.langkitApiSecret.name | string | `"langkit-api-secret"` | Name of the secret that stores the WhyLabs LangKit API Secret |
+| secrets.whylabsApiKey.name | string | `"whylabs-api-key"` | Name of the secret that stores the WhyLabs API Key |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
@@ -146,10 +129,7 @@ helm-docs --dry-run
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
 | tolerations | list | `[]` |  |
-| volumes[0].emptyDir | object | `{}` |  |
-| volumes[0].name | string | `"temp-dir"` |  |
-| volumes[1].emptyDir | object | `{}` |  |
-| volumes[1].name | string | `"home"` |  |
+| volumes | list | `[{"emptyDir":{},"name":"temp-dir"},{"emptyDir":{},"name":"home"}]` | Volumes to create |
 
 ----------------------------------------------
 Autogenerated from chart metadata using [helm-docs v1.12.0](https://github.com/norwoodj/helm-docs/releases/v1.12.0)
