@@ -1,4 +1,4 @@
-replicaCount: 3
+replicaCount: 4
 
 nameOverride: ""
 fullnameOverride: ""
@@ -31,7 +31,7 @@ ingress:
 image:
   repository: whylabs/whylogs
   pullPolicy: Always
-  tag: py-llm-1.0.2.dev6
+  tag: py-llm-1.0.2.dev10
   containerPort: 8000
 
 imagePullSecrets: []
@@ -56,6 +56,8 @@ containers:
     # runAsUser: 1000
   # containers.env -- (list) Environment variables for the containers
   env:
+    - name: LANGKIT_WORKERS
+      value: "1"
     - name: TRANSFORMERS_OFFLINE
       value: "1"
     - name: HF_DATASETS_OFFLINE
@@ -71,25 +73,17 @@ containers:
     - name: home
       mountPath: /home
 
-initContainers:
-  # initContainers.command -- (list) Command for init container
-  command: ["sh", "-c", "cp -R /opt/whylogs-container/.cache /home/"]
-  # initContainers.volumeMounts -- (list) Volume mounts for init container
-  volumeMounts:
-    - name: home
-      mountPath: /home
-
 service:
   type: ClusterIP
   port: 80
 
 resources:
   requests:
-    cpu: "4"
-    memory: 8Gi
+    cpu: "1"
+    memory: 6Gi
   limits:
-    cpu: "8"
-    memory: 16Gi
+    cpu: "1"
+    memory: 6Gi
     
 secrets:
   whylabsApiKey:

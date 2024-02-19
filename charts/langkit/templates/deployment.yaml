@@ -28,18 +28,6 @@ spec:
       serviceAccountName: {{ include "langkit.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.pod.securityContext | nindent 8 }}
-      initContainers:
-        - name: init
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          securityContext:
-            {{- toYaml .Values.containers.securityContext | nindent 12 }}
-          command:
-            {{- toYaml .Values.initContainers.command | nindent 12 }}
-          {{- with .Values.initContainers.volumeMounts }}
-          volumeMounts:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

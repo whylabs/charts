@@ -37,6 +37,10 @@ No LangKit configurations are required out of the box. However, for further cust
 review the [langkit-container-examples](https://github.com/whylabs/langkit-container-examples)
 repository for more details.
 
+### Hardware Requirements
+
+:rocket: For best performance, use Intel processors and ≥ `6 GiB` memory per replica.
+
 ## Helm Chart Installation
 
 ### Template
@@ -55,7 +59,7 @@ View the difference between the current state and desired state.
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
-  langkit langkit-0.9.0.tgz
+  langkit langkit-0.10.0.tgz
 ```
 
 ### Install/Update
@@ -63,14 +67,14 @@ helm diff upgrade \
 helm upgrade --install \
   --create-namespace \
   --namespace langkit \
-  langkit langkit-0.9.0.tgz
+  langkit langkit-0.10.0.tgz
 ```
 
 ### Uninstall
 ```shell
 helm uninstall \
   --namespace langkit \
-  langkit langkit-0.9.0.tgz
+  langkit langkit-0.10.0.tgz
 ```
 
 ## Development
@@ -88,22 +92,20 @@ helm-docs --dry-run
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| containers.env | list | `[{"name":"TRANSFORMERS_OFFLINE","value":1},{"name":"HF_DATASETS_OFFLINE","value":1},{"name":"HOME","value":"/home"},{"name":"HF_HOME","value":"/home/.cache/hf_home"}]` | Environment variables for the containers |
+| containers.env | list | `[{"name":"LANGKIT_WORKERS","value":"1"},{"name":"TRANSFORMERS_OFFLINE","value":"1"},{"name":"HF_DATASETS_OFFLINE","value":"1"},{"name":"HOME","value":"/home"},{"name":"HF_HOME","value":"/home/.cache/hf_home"}]` | Environment variables for the containers |
 | containers.securityContext | object | `{"readOnlyRootFilesystem":true,"runAsUser":1000}` | Container security context |
 | containers.volumeMounts | list | `[{"mountPath":"/tmp","name":"temp-dir"},{"mountPath":"/home","name":"home"}]` | Volume mounts for containers |
 | fullnameOverride | string | `""` |  |
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"whylabs/whylogs"` |  |
-| image.tag | string | `"py-llm-1.0.2.dev6"` |  |
+| image.tag | string | `"py-llm-1.0.2.dev10"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
-| initContainers.command | list | `["sh","-c","cp -R /opt/whylogs-container/.cache /home/"]` | Command for init container |
-| initContainers.volumeMounts | list | `[{"mountPath":"/home","name":"home"}]` | Volume mounts for init container |
 | livenessProbe.initialDelaySeconds | int | `15` |  |
 | livenessProbe.periodSeconds | int | `10` |  |
 | livenessProbe.tcpSocket.port | int | `8000` |  |
@@ -115,11 +117,11 @@ helm-docs --dry-run
 | readinessProbe.initialDelaySeconds | int | `15` |  |
 | readinessProbe.periodSeconds | int | `10` |  |
 | readinessProbe.tcpSocket.port | int | `8000` |  |
-| replicaCount | int | `3` |  |
-| resources.limits.cpu | string | `"8"` |  |
-| resources.limits.memory | string | `"16Gi"` |  |
-| resources.requests.cpu | string | `"4"` |  |
-| resources.requests.memory | string | `"8Gi"` |  |
+| replicaCount | int | `4` |  |
+| resources.limits.cpu | string | `"1"` |  |
+| resources.limits.memory | string | `"6Gi"` |  |
+| resources.requests.cpu | string | `"1"` |  |
+| resources.requests.memory | string | `"6Gi"` |  |
 | secrets.langkitApiSecret.name | string | `"langkit-api-secret"` | Name of the secret that stores the WhyLabs LangKit API Secret |
 | secrets.whylabsApiKey.name | string | `"whylabs-api-key"` | Name of the secret that stores the WhyLabs API Key |
 | service.port | int | `80` |  |
