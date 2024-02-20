@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning]
 (https://semver.org/spec/v2.0.0.html).
 
+## [0.10.0] - 2023-02-19
+
+### Added
+
+- Recommendation for Intel processors and `6 GiB` of memory per pod.
+
+### Changed
+
+- Updated default image tag from `py-llm-1.0.2.dev6` to `py-llm-1.0.2.dev10`.
+- Changed replica count from `3` to `4` for improved performance.
+- Updated resource requests and limits for improved performance.
+
+### Removed
+
+- Removed the init container.
+
 ## [0.9.0] - 2023-02-15
 
 ### Added
