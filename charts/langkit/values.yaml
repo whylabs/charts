@@ -1,4 +1,4 @@
-replicaCount: 4
+replicaCount: 2
 
 nameOverride: ""
 fullnameOverride: ""
@@ -31,7 +31,7 @@ ingress:
 image:
   repository: whylabs/whylogs
   pullPolicy: Always
-  tag: py-llm-1.0.2.dev10
+  tag: py-llm-1.0.5
   containerPort: 8000
 
 imagePullSecrets: []
@@ -55,17 +55,7 @@ containers:
     # runAsNonRoot: true
     # runAsUser: 1000
   # containers.env -- (list) Environment variables for the containers
-  env:
-    - name: LANGKIT_WORKERS
-      value: "1"
-    - name: TRANSFORMERS_OFFLINE
-      value: "1"
-    - name: HF_DATASETS_OFFLINE
-      value: "1"
-    - name: HOME
-      value: "/home"
-    - name: HF_HOME
-      value: "/home/.cache/hf_home"
+  env: []
   # containers.volumeMounts -- (list) Volume mounts for containers
   volumeMounts:
     - name: temp-dir
@@ -79,11 +69,11 @@ service:
 
 resources:
   requests:
-    cpu: "1"
-    memory: 6Gi
+    cpu: "4"
+    memory: 3Gi
   limits:
-    cpu: "1"
-    memory: 6Gi
+    cpu: "4"
+    memory: 3Gi
     
 secrets:
   whylabsApiKey:
@@ -113,18 +103,18 @@ tolerations: []
   #   value: spot
 
 # @ignored
-affinity:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          topologyKey: "kubernetes.io/hostname"
-          labelSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                  - langkit
+affinity: {}
+  # podAntiAffinity:
+  #   preferredDuringSchedulingIgnoredDuringExecution:
+  #     - weight: 100
+  #       podAffinityTerm:
+  #         topologyKey: "kubernetes.io/hostname"
+  #         labelSelector:
+  #           matchExpressions:
+  #             - key: app.kubernetes.io/name
+  #               operator: In
+  #               values:
+  #                 - langkit
 
 # volumes -- (list) Volumes to create
 volumes:
