@@ -92,14 +92,14 @@ helm-docs --dry-run
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| containers.env | list | `[{"name":"LANGKIT_WORKERS","value":"1"},{"name":"TRANSFORMERS_OFFLINE","value":"1"},{"name":"HF_DATASETS_OFFLINE","value":"1"},{"name":"HOME","value":"/home"},{"name":"HF_HOME","value":"/home/.cache/hf_home"}]` | Environment variables for the containers |
+| containers.env | list | `[]` | Environment variables for the containers |
 | containers.securityContext | object | `{"readOnlyRootFilesystem":true,"runAsUser":1000}` | Container security context |
 | containers.volumeMounts | list | `[{"mountPath":"/tmp","name":"temp-dir"},{"mountPath":"/home","name":"home"}]` | Volume mounts for containers |
 | fullnameOverride | string | `""` |  |
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"whylabs/whylogs"` |  |
-| image.tag | string | `"py-llm-1.0.2.dev10"` |  |
+| image.tag | string | `"py-llm-1.0.5"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
