@@ -1,4 +1,4 @@
-replicaCount: 4
+replicaCount: 2
 
 nameOverride: ""
 fullnameOverride: ""
@@ -69,11 +69,11 @@ service:
 
 resources:
   requests:
-    cpu: "1"
-    memory: 6Gi
+    cpu: "4"
+    memory: 3Gi
   limits:
-    cpu: "1"
-    memory: 6Gi
+    cpu: "4"
+    memory: 3Gi
     
 secrets:
   whylabsApiKey:
@@ -103,18 +103,18 @@ tolerations: []
   #   value: spot
 
 # @ignored
-affinity:
-  podAntiAffinity:
-    preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          topologyKey: "kubernetes.io/hostname"
-          labelSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                  - langkit
+affinity: {}
+  # podAntiAffinity:
+  #   preferredDuringSchedulingIgnoredDuringExecution:
+  #     - weight: 100
+  #       podAffinityTerm:
+  #         topologyKey: "kubernetes.io/hostname"
+  #         labelSelector:
+  #           matchExpressions:
+  #             - key: app.kubernetes.io/name
+  #               operator: In
+  #               values:
+  #                 - langkit
 
 # volumes -- (list) Volumes to create
 volumes:

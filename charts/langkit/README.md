@@ -59,7 +59,7 @@ View the difference between the current state and desired state.
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
-  langkit langkit-0.10.0.tgz
+  langkit langkit-0.11.0.tgz
 ```
 
 ### Install/Update
@@ -67,14 +67,14 @@ helm diff upgrade \
 helm upgrade --install \
   --create-namespace \
   --namespace langkit \
-  langkit langkit-0.10.0.tgz
+  langkit langkit-0.11.0.tgz
 ```
 
 ### Uninstall
 ```shell
 helm uninstall \
   --namespace langkit \
-  langkit langkit-0.10.0.tgz
+  langkit langkit-0.11.0.tgz
 ```
 
 ## Development
@@ -117,11 +117,11 @@ helm-docs --dry-run
 | readinessProbe.initialDelaySeconds | int | `15` |  |
 | readinessProbe.periodSeconds | int | `10` |  |
 | readinessProbe.tcpSocket.port | int | `8000` |  |
-| replicaCount | int | `4` |  |
-| resources.limits.cpu | string | `"1"` |  |
-| resources.limits.memory | string | `"6Gi"` |  |
-| resources.requests.cpu | string | `"1"` |  |
-| resources.requests.memory | string | `"6Gi"` |  |
+| replicaCount | int | `2` |  |
+| resources.limits.cpu | string | `"4"` |  |
+| resources.limits.memory | string | `"3Gi"` |  |
+| resources.requests.cpu | string | `"4"` |  |
+| resources.requests.memory | string | `"3Gi"` |  |
 | secrets.langkitApiSecret.name | string | `"langkit-api-secret"` | Name of the secret that stores the WhyLabs LangKit API Secret |
 | secrets.whylabsApiKey.name | string | `"whylabs-api-key"` | Name of the secret that stores the WhyLabs API Key |
 | service.port | int | `80` |  |
