@@ -87,14 +87,16 @@ livenessProbe:
   httpGet:
     path: /health
     port: 8000
-  initialDelaySeconds: 15
-  periodSeconds: 10
+  failureThreshold: 3
+  initialDelaySeconds: 30
+  periodSeconds: 30
 readinessProbe:
   httpGet:
     path: /health
     port: 8000
-  initialDelaySeconds: 15
-  periodSeconds: 10
+  failureThreshold: 10
+  initialDelaySeconds: 30
+  periodSeconds: 30
 
 nodeSelector: {}
 
