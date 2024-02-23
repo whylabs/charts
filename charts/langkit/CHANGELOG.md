@@ -11,10 +11,7 @@ and this project adheres to [Semantic Versioning]
 ### Changed
 
 - Updated default image from `py-llm-1.0.5` to `py-llm-1.0.6`
-
-### Fixed
-
-- Use correct probe endpoint.
+- Changed health probes to use HTTP instead of TCP
 
 ## [0.11.0] - 2023-02-22
 
