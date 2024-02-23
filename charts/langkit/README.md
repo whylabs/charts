@@ -59,7 +59,7 @@ View the difference between the current state and desired state.
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
-  langkit langkit-0.11.0.tgz
+  langkit langkit-0.12.0.tgz
 ```
 
 ### Install/Update
@@ -67,14 +67,14 @@ helm diff upgrade \
 helm upgrade --install \
   --create-namespace \
   --namespace langkit \
-  langkit langkit-0.11.0.tgz
+  langkit langkit-0.12.0.tgz
 ```
 
 ### Uninstall
 ```shell
 helm uninstall \
   --namespace langkit \
-  langkit langkit-0.11.0.tgz
+  langkit langkit-0.12.0.tgz
 ```
 
 ## Development
@@ -99,24 +99,26 @@ helm-docs --dry-run
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"whylabs/whylogs"` |  |
-| image.tag | string | `"py-llm-1.0.5"` |  |
+| image.tag | string | `"py-llm-1.0.6"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts | list | `[]` |  |
 | ingress.tls | list | `[]` |  |
+| livenessProbe.httpGet.path | string | `"/health"` |  |
+| livenessProbe.httpGet.port | int | `8000` |  |
 | livenessProbe.initialDelaySeconds | int | `15` |  |
 | livenessProbe.periodSeconds | int | `10` |  |
-| livenessProbe.tcpSocket.port | int | `8000` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | pod.annotations | object | `{}` |  |
 | pod.labels | object | `{}` |  |
 | pod.securityContext | object | `{}` |  |
+| readinessProbe.httpGet.path | string | `"/health"` |  |
+| readinessProbe.httpGet.port | int | `8000` |  |
 | readinessProbe.initialDelaySeconds | int | `15` |  |
 | readinessProbe.periodSeconds | int | `10` |  |
-| readinessProbe.tcpSocket.port | int | `8000` |  |
 | replicaCount | int | `2` |  |
 | resources.limits.cpu | string | `"4"` |  |
 | resources.limits.memory | string | `"3Gi"` |  |
