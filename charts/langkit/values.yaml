@@ -31,7 +31,7 @@ ingress:
 image:
   repository: whylabs/whylogs
   pullPolicy: Always
-  tag: py-llm-1.0.5
+  tag: py-llm-1.0.8
   containerPort: 8000
 
 imagePullSecrets: []
@@ -84,15 +84,19 @@ secrets:
     name: langkit-api-secret
 
 livenessProbe:
-  tcpSocket:
+  httpGet:
+    path: /health
     port: 8000
-  initialDelaySeconds: 15
-  periodSeconds: 10
+  failureThreshold: 3
+  initialDelaySeconds: 30
+  periodSeconds: 30
 readinessProbe:
-  tcpSocket:
+  httpGet:
+    path: /health
     port: 8000
-  initialDelaySeconds: 15
-  periodSeconds: 10
+  failureThreshold: 10
+  initialDelaySeconds: 30
+  periodSeconds: 30
 
 nodeSelector: {}
 
