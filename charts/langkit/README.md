@@ -99,7 +99,7 @@ helm-docs --dry-run
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"whylabs/whylogs"` |  |
-| image.tag | string | `"py-llm-1.0.6"` |  |
+| image.tag | string | `"py-llm-1.0.8"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
