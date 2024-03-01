@@ -35,7 +35,7 @@ image:
   containerPort: 8000
 
 imagePullSecrets:
-  - name: whylabs-gitlab-registry-secret
+  - name: langkit-gitlab-registry-secret
 
 pod:
   annotations: {}
