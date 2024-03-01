@@ -33,8 +33,8 @@ kubectl create secret generic langkit-api-secret \
 * Create a secret with a WhyLabs provided GitLab token to pull the LangKit image
 
 ```
-kubectl create secret docker-registry whylabs-gitlab-registry-secret \
-  --docker-server=registry.gitlab.com \
+kubectl create secret docker-registry langkit-gitlab-registry-secret \
+  --docker-server="https://registry.gitlab.com" \
   --docker-username="project_55361491_bot_4a4030bd91182991f959fe2a3cdd2762" \
   --docker-password="<token>" \
   --docker-email="project_55361491_bot_4a4030bd91182991f959fe2a3cdd2762@noreply.gitlab.com" \
@@ -110,7 +110,7 @@ helm-docs --dry-run
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` |  |
 | image.tag | string | `"1.0.8"` |  |
-| imagePullSecrets[0].name | string | `"whylabs-gitlab-registry-secret"` |  |
+| imagePullSecrets[0].name | string | `"langkit-gitlab-registry-secret"` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
