@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning]
 (https://semver.org/spec/v2.0.0.html).
 
+## [0.13.0] - 2023-02-29
+
+### Changed
+
+- Updated default image to `1.0.8` within GitLab container registry.
+
+### Added
+
+- Documentation for creating a secret for access to the private image registry
+
 ## [0.12.0] - 2023-02-29
 
 ### Changed

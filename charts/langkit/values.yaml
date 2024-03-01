@@ -29,12 +29,13 @@ ingress:
   #      - chart-example.local
 
 image:
-  repository: whylabs/whylogs
+  repository: registry.gitlab.com/whylabs/langkit-container
   pullPolicy: Always
-  tag: py-llm-1.0.8
+  tag: "1.0.8"
   containerPort: 8000
 
-imagePullSecrets: []
+imagePullSecrets:
+  - name: whylabs-gitlab-registry-secret
 
 pod:
   annotations: {}
@@ -60,8 +61,6 @@ containers:
   volumeMounts:
     - name: temp-dir
       mountPath: /tmp
-    - name: home
-      mountPath: /home
 
 service:
   type: ClusterIP
@@ -70,10 +69,10 @@ service:
 resources:
   requests:
     cpu: "4"
-    memory: 3Gi
+    memory: 4Gi
   limits:
     cpu: "4"
-    memory: 3Gi
+    memory: 4Gi
     
 secrets:
   whylabsApiKey:
@@ -123,6 +122,4 @@ affinity: {}
 # volumes -- (list) Volumes to create
 volumes:
   - name: temp-dir
-    emptyDir: {}
-  - name: home
     emptyDir: {}
