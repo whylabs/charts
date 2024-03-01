@@ -35,9 +35,9 @@ kubectl create secret generic langkit-api-secret \
 ```
 kubectl create secret docker-registry whylabs-gitlab-registry-secret \
   --docker-server=registry.gitlab.com \
-  --docker-username="whylabs-system" \
+  --docker-username="project_55361491_bot_4a4030bd91182991f959fe2a3cdd2762" \
   --docker-password="<token>" \
-  --docker-email="system@whylabs.ai" \
+  --docker-email="project_55361491_bot_4a4030bd91182991f959fe2a3cdd2762@noreply.gitlab.com" \
   --namespace=langkit
 ```
 
