@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning]
 
 ### Changed
 
-- Updated image from `1.0.8` to `1.0.12`
+- Updated image from `1.0.8` to `1.0.11`
 
 ## [0.13.1] - 2023-03-01
 
