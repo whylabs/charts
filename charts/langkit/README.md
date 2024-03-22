@@ -109,7 +109,7 @@ helm-docs --dry-run
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` |  |
-| image.tag | string | `"1.0.8"` |  |
+| image.tag | string | `"1.0.11"` |  |
 | imagePullSecrets[0].name | string | `"langkit-gitlab-registry-secret"` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
@@ -138,6 +138,7 @@ helm-docs --dry-run
 | resources.requests.memory | string | `"4Gi"` |  |
 | secrets.langkitApiSecret.name | string | `"langkit-api-secret"` | Name of the secret that stores the WhyLabs LangKit API Secret |
 | secrets.whylabsApiKey.name | string | `"whylabs-api-key"` | Name of the secret that stores the WhyLabs API Key |
+| service.annotations | object | `{}` |  |
 | service.port | int | `80` |  |
 | service.type | string | `"ClusterIP"` |  |
 | serviceAccount.annotations | object | `{}` |  |
