@@ -6,26 +6,32 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning]
 (https://semver.org/spec/v2.0.0.html).
 
+## [0.16.0] - 2024-03-28
 
-## [0.15.0] - 2023-03-22
+### Changed
+
+- Updated image from `1.0.11` to `1.0.13`
+
+
+## [0.15.0] - 2024-03-22
 
 ### Added
 
 - Added configurable annotations for `Service` resource
 
-## [0.14.0] - 2023-03-21
+## [0.14.0] - 2024-03-21
 
 ### Changed
 
 - Updated image from `1.0.8` to `1.0.11`
 
-## [0.13.1] - 2023-03-01
+## [0.13.1] - 2024-03-01
 
 ### Changed
 
 - Change `imagePullSecret` name to be scoped to service
 
-## [0.13.0] - 2023-02-29
+## [0.13.0] - 2024-02-29
 
 ### Changed
 
@@ -35,20 +41,20 @@ and this project adheres to [Semantic Versioning]
 
 - Documentation for creating a secret for access to the private image registry
 
-## [0.12.0] - 2023-02-29
+## [0.12.0] - 2024-02-29
 
 ### Changed
 
 - Updated default image from `py-llm-1.0.5` to `py-llm-1.0.8`
 - Changed health probes to use HTTP instead of TCP
 
-## [0.11.0] - 2023-02-22
+## [0.11.0] - 2024-02-22
 
 ### Changed
 
 - Updated default image from `py-llm-1.0.2.dev10` to `py-llm-1.0.5`.
 
-## [0.10.0] - 2023-02-19
+## [0.10.0] - 2024-02-19
 
 ### Added
 
@@ -64,26 +70,26 @@ and this project adheres to [Semantic Versioning]
 
 - Removed the init container.
 
-## [0.9.0] - 2023-02-15
+## [0.9.0] - 2024-02-15
 
 ### Added
 
 - Added `TRANSFORMERS_OFFLINE` and `HF_DATASETS_OFFLINE` environment variables.
 
-## [0.8.0] - 2023-02-14 :heart:
+## [0.8.0] - 2024-02-14 :heart:
 
 ### Added
 
 - Added managed `ServiceAccount` with configurations for `annotations` to
   support authentication methods such as AWS IRSA.
 
-## [0.7.0] - 2023-02-12
+## [0.7.0] - 2024-02-12
 
 ### Changed
 
 - Updated default image tag from `py-llm-1.0.2.dev2` to `py-llm-1.0.2.dev4`
 
-## [0.6.0] - **Breaking Changes** - 2023-02-01
+## [0.6.0] - **Breaking Changes** - 2024-02-01
 
 ### Breaking
 
@@ -104,14 +110,14 @@ and this project adheres to [Semantic Versioning]
 
 - Removed default `root-config` volume and volume mount
 
-## [0.5.0] - 2023-01-30
+## [0.5.0] - 2024-01-30
 
 ### Changed
 
 - Updated the default image version from `py-llm-1.0.2.dev0` to `py-llm-1.0.2.dev1`
 - Default `tolerations` is set to `[]`
 
-## [0.4.0] - **Breaking Changes** - 2023-01-26
+## [0.4.0] - **Breaking Changes** - 2024-01-26
 
 ### Added
 
