@@ -109,7 +109,7 @@ helm-docs --dry-run
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` |  |
-| image.tag | string | `"1.0.11"` |  |
+| image.tag | string | `"1.0.13"` |  |
 | imagePullSecrets[0].name | string | `"langkit-gitlab-registry-secret"` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
