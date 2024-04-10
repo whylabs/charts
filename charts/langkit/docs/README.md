@@ -27,8 +27,8 @@ maintainability.
 
 1. Install dependencies
 
-  Navigate to the cloned directory and run the following command to install
-  `eksctl` and `helm` for managing EKS clusters and Helm charts:
+    Navigate to the cloned directory and run the following command to install
+    `eksctl` and `helm` for managing EKS clusters and Helm charts:
 
     ```shell
     ./prepare.sh
@@ -36,8 +36,9 @@ maintainability.
 
 1. Create EKS Fargate Cluster
 
- This script creates an EKS cluster configured to use Fargate for pod execution.
- By default, it creates a cluster named whylabs in the us-west-2 region:
+    This script creates an EKS cluster configured to use Fargate for pod
+    execution. By default, it creates a cluster named whylabs in the us-west-2
+    region:
 
     ```shell
     ./deploy-fargate.sh \
