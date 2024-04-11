@@ -18,18 +18,18 @@
 # Downloads a .tgz file to the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/langkit \
-  --version "0.10.0"
+  --version "0.17.0"
 
 helm diff upgrade \
   --allow-unreleased \
   --namespace langkit \
   `# Specify the .tgz file as the chart` \
-  langkit langkit-0.10.0.tgz
+  langkit langkit-0.17.0.tgz
 
 helm upgrade --install \
   --create-namespace \
   --namespace langkit \
-  langkit langkit-0.10.0.tgz
+  langkit langkit-0.17.0.tgz
 ```
 
 #### Extended Example
@@ -37,7 +37,7 @@ helm upgrade --install \
 # Configure local variables for clarity and simplicity
 helm_repo="ghcr.io/whylabs"
 chart_name="langkit"
-chart_version="0.10.0"
+chart_version="0.17.0"
 chart="${chart_name}-${chart_version}.tgz"
 
 # Release and namespace values mirror other variables for simplicity.

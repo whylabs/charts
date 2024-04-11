@@ -69,7 +69,7 @@ View the difference between the current state and desired state.
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
-  langkit langkit-0.12.0.tgz
+  langkit langkit-0.17.0.tgz
 ```
 
 ### Install/Update
@@ -77,14 +77,14 @@ helm diff upgrade \
 helm upgrade --install \
   --create-namespace \
   --namespace langkit \
-  langkit langkit-0.12.0.tgz
+  langkit langkit-0.17.0.tgz
 ```
 
 ### Uninstall
 ```shell
 helm uninstall \
   --namespace langkit \
-  langkit langkit-0.12.0.tgz
+  langkit langkit-0.17.0.tgz
 ```
 
 ## Development
