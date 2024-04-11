@@ -6,6 +6,11 @@
 
 > :warning: Review the [documentation on using WhyLab's Helm charts](../../README.md#how-to-use-whylabs-helm-repository)
 
+## Quickstart
+
+View our [quickstart guide](docs/quickstart/README.md) that sets up a Kubernetes
+cluster and deploys Langkit via this chart.
+
 ## Prerequisites
 
 NOTE: Change the `--namespace` value if you will be deploying into a namespace other
