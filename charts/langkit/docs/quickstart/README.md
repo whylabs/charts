@@ -118,3 +118,19 @@ registry_token=""
       --registry-username "${registry_username}" \
       --registry-token "${registry_token}"
     ```
+
+1. Retrieve Langkit URL
+
+    > :warning: A Network Load Balancer is created by the Langkit service. You
+    > can reach the service at the DNS address of the load balancer. It may take
+    > a few moments for the load balancer to be provisioned. The following
+    > command will return the hostname once it's available. 
+
+    ```shell
+    hostname=$(kubectl get service langkit \
+      --namespace "${namespace}" \
+      -o json | \
+        jq -r '.status.loadBalancer.ingress[0].hostname')
+
+    printf "\nLangkit Hostname: http://${hostname}\n\n"
+    ```
