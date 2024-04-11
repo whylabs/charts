@@ -134,3 +134,12 @@ registry_token=""
 
     printf "\nLangkit Hostname: http://${hostname}\n\n"
     ```
+
+1. Verify Deployment
+
+    You can confirm that the deployment was successful by executing the
+    following command. You should see `HTTP/1.1 200 OK` within the response.
+
+    ```shell
+    curl -v "http://${hostname}/health"
+    ```
