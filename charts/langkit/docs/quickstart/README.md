@@ -14,11 +14,12 @@ maintainability.
 
 ## Clone This Repository
 
-1. Clone this repository
+Clone this repository. The following tutorial will be working with the shell
+script files within the directory of this `README`.
 
-    ```shell
-    git clone https://github.com/whylabs/charts.git
-    ```
+```shell
+git clone https://github.com/whylabs/charts.git
+```
 
 ## Environment Setup
 
@@ -35,19 +36,19 @@ shell that already has your credentials configured.
 
 ### Using Remote Terminal via [AWS CloudShell](https://aws.amazon.com/cloudshell/)
 
-1. Login to your AWS Account
+1. **Login to your AWS Account**
 
     Be sure to login with a role that has sufficient permissions to create
     Networking, EC2, EKS, and IAM resources.
 
-1. Verify that you're in the desired region 
+1. **Verify that you're in the desired region** 
 
     The region can be selected at the top right corner of the AWS console
     adjacent to your username/email address.
 
-1. Search for and select/open the `CloudShell` service
+1. **Search for and select/open the `CloudShell` service**
 
-1. [Upload the provisioning scripts to the `CloudShell` environment](https://docs.aws.amazon.com/cloudshell/latest/userguide/getting-started.html#folder-upload)
+1. **[Upload the provisioning scripts to the `CloudShell` environment](https://docs.aws.amazon.com/cloudshell/latest/userguide/getting-started.html#folder-upload)**
 
   1. Click the `Actions` drop down menu and choose `Upload File`
   1. Select and upload the `prepare.sh`, `deploy-kubernetes.sh`, and
@@ -55,7 +56,7 @@ shell that already has your credentials configured.
 
 ### Using Local Terminal
 
-1. Ensure the AWS enviornment is configured correctly. See the official
+Ensure the AWS enviornment is configured correctly. See the official
 [getting started with the AWS CLI documentation](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html)
 
 ### Setting Variables
@@ -80,13 +81,13 @@ registry_token=""
 
 ## Execute Provisioning Scripts
 
-1. Ensure scripts have execution permissions set
+1. **Ensure scripts have execution permissions set**
 
     ```shell
     chmod 755 prepare.sh deploy-kubernetes.sh deploy-langkit.sh
     ```
 
-1. Install dependencies
+1. **Install dependencies**
 
     Navigate to the cloned directory and run the following command to install
     `eksctl` and `helm` for managing EKS clusters and Helm charts:
@@ -95,7 +96,7 @@ registry_token=""
     ./prepare.sh
     ```
 
-1. Create EKS Cluster
+1. **Create EKS Cluster**
     
     This script creates an EKS cluster. By default, it creates a cluster named
     `whylabs` in the `us-west-2` region. Change the values to suit your needs.
@@ -108,7 +109,7 @@ registry_token=""
       --aws-region "${aws_region}"
     ```
 
-1. Deploy Langkit
+1. **Deploy Langkit**
 
     ```shell
     ./deploy-langkit.sh \
@@ -119,7 +120,7 @@ registry_token=""
       --registry-token "${registry_token}"
     ```
 
-1. Retrieve Langkit URL
+1. **Retrieve Langkit URL**
 
     > :warning: A Network Load Balancer is created by the Langkit service. You
     > can reach the service at the DNS address of the load balancer. It may take
@@ -135,7 +136,7 @@ registry_token=""
     printf "\nLangkit Hostname: http://${hostname}\n\n"
     ```
 
-1. Verify Deployment
+1. **Verify Deployment**
 
     You can confirm that the deployment was successful by executing the
     following command. You should see `HTTP/1.1 200 OK` within the response.
