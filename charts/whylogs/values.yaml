@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: whylabs/whylogs
+  repository: registry.gitlab.com/whylabs/whylogs-container
   pullPolicy: IfNotPresent
-  tag: py-latest
+  tag: 1.0.14
 
 env:
   WHYLABS_ORG_ID: "org-0"
@@ -17,7 +17,8 @@ envFromSecrets:
       name: whylabs-api-key
   - secretRef:
       name: whylogs-container-password
-imagePullSecrets: []
+imagePullSecrets:
+  - name: gitlab-container-registry-auth
 nameOverride: ""
 fullnameOverride: ""
 
@@ -38,9 +39,9 @@ podLabels: {}
 podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext: {}
-  # readOnlyRootFilesystem: true
-  # runAsUser: 1000
+securityContext:
+  readOnlyRootFilesystem: true
+  runAsUser: 1000
 
 service:
   annotations: {}
@@ -99,17 +100,14 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 # Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
+volumes:
+  - name: temp-dir
+    emptyDir: {}
 
 # Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
+volumeMounts:
+  - name: temp-dir
+    mountPath: /tmp
 
 nodeSelector: {}
 
