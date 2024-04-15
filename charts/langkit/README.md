@@ -6,6 +6,11 @@
 
 > :warning: Review the [documentation on using WhyLab's Helm charts](../../README.md#how-to-use-whylabs-helm-repository)
 
+## Quickstart
+
+View our [quickstart guide](docs/quickstart/README.md) that sets up a Kubernetes
+cluster and deploys Langkit via this chart.
+
 ## Prerequisites
 
 NOTE: Change the `--namespace` value if you will be deploying into a namespace other
@@ -69,7 +74,7 @@ View the difference between the current state and desired state.
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
-  langkit langkit-0.12.0.tgz
+  langkit langkit-0.17.0.tgz
 ```
 
 ### Install/Update
@@ -77,14 +82,14 @@ helm diff upgrade \
 helm upgrade --install \
   --create-namespace \
   --namespace langkit \
-  langkit langkit-0.12.0.tgz
+  langkit langkit-0.17.0.tgz
 ```
 
 ### Uninstall
 ```shell
 helm uninstall \
   --namespace langkit \
-  langkit langkit-0.12.0.tgz
+  langkit langkit-0.17.0.tgz
 ```
 
 ## Development
@@ -109,7 +114,7 @@ helm-docs --dry-run
 | image.containerPort | int | `8000` |  |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` |  |
-| image.tag | string | `"1.0.13"` |  |
+| image.tag | string | `"1.0.14"` |  |
 | imagePullSecrets[0].name | string | `"langkit-gitlab-registry-secret"` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
