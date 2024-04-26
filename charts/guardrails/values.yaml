@@ -1,0 +1,138 @@
+# Default values for guardrails.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+
+image:
+  # -- Image repository for the `guardrails` container.
+  repository: registry.gitlab.com/whylabs/whylogs-container
+  # -- Image pull policy for the `guardrails` container.
+  pullPolicy: IfNotPresent
+  # -- (string) Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set.
+  tag: 1.0.14
+
+imagePullSecrets:
+  # -- (list) Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials`.
+  - name: ""
+
+# -- (string) Override the name of the chart.
+nameOverride: ""
+
+# -- (string) Override the full name of the chart.
+fullnameOverride: ""
+
+# -- Labels to add to all chart resources.
+commonLabels: {}
+
+# -- [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container.
+env: {}
+  # MY_ENV_VAR: "my env var value"
+
+serviceAccount:
+  # -- If `true`, create a new `ServiceAccount`.
+  create: true
+  # -- (string) If this is set and `serviceAccount.create` is `true` this will be used for the created `ServiceAccount` name, if set and `serviceAccount.create` is `false` then this will define an existing `ServiceAccount` to use.
+  name: ""
+  # -- Labels to add to the service account.
+  labels: {}
+  # -- Annotations to add to the service account.
+  annotations: {}
+  # -- Set this to `false` to [opt out of API credential automounting](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#opt-out-of-api-credential-automounting) for the `ServiceAccount`.
+  automount: true
+
+service:
+  # -- Service annotations.
+  annotations: {}
+  # -- Service Type, i.e. ClusterIp, LoadBalancer, etc.
+  type: ClusterIP
+  # -- Service HTTP port.
+  port: 80
+  # -- The port on which the application container is listening.
+  targetPort: 8000
+  
+# -- Annotations to add to the `Pod`.
+podAnnotations: {}
+
+# -- Labels to add to the `Pod`.
+podLabels: {}
+
+# -- [Pod security context](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core), this supports full customisation.
+podSecurityContext:
+  runAsNonRoot: true
+
+# -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for the `guardrails` container.
+securityContext:
+  privileged: false
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop: ["ALL"]
+
+# -- [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) configuration for the `guardrails` container.
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+# -- [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container.
+resources:
+  requests:
+    cpu: "4"
+    memory: 4Gi
+  limits:
+    cpu: "4"
+    memory: 4Gi
+
+# -- [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container.
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  failureThreshold: 3
+  initialDelaySeconds: 30
+  periodSeconds: 30
+
+# -- [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container.
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  failureThreshold: 10
+  initialDelaySeconds: 30
+  periodSeconds: 30
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+# -- Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`.
+extraVolumes: []
+
+# -- Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container.
+extraVolumeMounts: []
+
+# -- Node labels to match for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+nodeSelector: {}
+
+# -- Node taints which will be tolerated for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+tolerations: []
+
+# -- Affinity settings for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). If an explicit label selector is not provided for pod affinity or pod anti-affinity one will be created from the pod selector labels.
+affinity: {}
