@@ -1,0 +1,337 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Deployment of Containerized Applications on EC2 Instances
+
+Parameters:
+  001WhyLabsApiKey:
+    Type: String
+    Description: "[REQUIRED] API key for WhyLabs"
+    NoEcho: true
+
+  002WhyLabsContainerPassword:
+    Type: String
+    Description: "[REQUIRED] Password for WhyLabs container"
+    NoEcho: true
+
+  003DockerRegistryPassword:
+    Type: String
+    Description: "[REQUIRED] Password for Docker registry authentication"
+    NoEcho: true
+
+  004DockerRegistryUsername:
+    Type: String
+    Description: "[REQUIRED] Username for Docker registry authentication"
+    NoEcho: true
+
+  DockerRegistryUrl:
+    Type: String
+    Default: registry.gitlab.com
+    Description: URL of the private Docker registry
+
+  InstanceType:
+    Type: String
+    Default: c6i.xlarge
+    Description: EC2 instance type.
+
+  ReplicaCount:
+    Type: Number
+    Default: 1
+    Description: Number of EC2 instances to launch.
+
+  ExistingVpcId:
+    Type: String
+    Default: ""
+    Description: Optional. Existing VPC ID to use instead of creating a new VPC. Leave empty to create a new VPC.
+
+  VpcCidr:
+    Type: String
+    Default: 10.0.0.0/16
+    Description: The CIDR block for the VPC.
+
+  PublicSubnetId1:
+    Type: String
+    Default: ""
+    Description: Optional. ID of the first public subnet for the ALB. Required if using an existing VPC.
+
+  PublicSubnetId2:
+    Type: String
+    Default: ""
+    Description: Optional. ID of the second public subnet for the ALB. Required if using an existing VPC.
+
+  PrivateSubnetId:
+    Type: String
+    Default: ""
+    Description: Optional. ID of the private subnet for instances. Required if using an existing VPC.
+
+  IngressCidr:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: CIDR block for allowing ingress traffic.
+
+  EgressCidr:
+    Type: String
+    Default: 0.0.0.0/0
+    Description: CIDR block for allowing egress traffic.
+
+  IngressPort:
+    Type: Number
+    Default: 80
+    Description: The TCP port for ingress traffic.
+
+  EgressPort:
+    Type: Number
+    Default: 80
+    Description: The TCP port for egress traffic.
+
+  AMIId:
+    Type: String
+    Default: ami-0ddda618e961f2270
+    Description: The ID of the AMI to be used for the EC2 instances.
+
+Conditions:
+  CreateVpc: !Equals [!Ref ExistingVpcId, ""]
+
+Resources:
+  ##### Networking
+  StackVPC:
+    Type: AWS::EC2::VPC
+    Condition: CreateVpc
+    Properties:
+      CidrBlock: !Ref VpcCidr
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+
+  InternetGateway:
+    Type: AWS::EC2::InternetGateway
+    Condition: CreateVpc
+
+  VPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Condition: CreateVpc
+    Properties:
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+      InternetGatewayId: !Ref InternetGateway
+
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Condition: CreateVpc
+    Properties:
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+      CidrBlock: 10.0.5.0/24
+      MapPublicIpOnLaunch: false
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs ''
+  
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet
+    Condition: CreateVpc
+    Properties:
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+      CidrBlock: 10.0.1.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select 
+        - 0
+        - !GetAZs ''
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet
+    Condition: CreateVpc
+    Properties:
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+      CidrBlock: 10.0.3.0/24
+      MapPublicIpOnLaunch: true
+      AvailabilityZone: !Select 
+        - 1
+        - !GetAZs ''
+
+  NatGatewayEIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateVpc
+    Properties:
+      Domain: VPC
+
+  NatGateway:
+    Type: AWS::EC2::NatGateway
+    Condition: CreateVpc
+    Properties:
+      AllocationId: !GetAtt NatGatewayEIP.AllocationId
+      SubnetId: !Ref PublicSubnet1
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Condition: CreateVpc
+    Properties:
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+
+  PublicRoute:
+    Type: AWS::EC2::Route
+    Condition: CreateVpc
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref InternetGateway
+
+  PrivateRouteTable:
+    Type: AWS::EC2::RouteTable
+    Condition: CreateVpc
+    Properties:
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+
+  PrivateRoute:
+    Type: AWS::EC2::Route
+    Condition: CreateVpc
+    Properties:
+      RouteTableId: !Ref PrivateRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      NatGatewayId: !Ref NatGateway
+
+  PublicRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: CreateVpc
+    Properties:
+      SubnetId: !Ref PublicSubnet1
+      RouteTableId: !Ref PublicRouteTable
+  
+  PublicRouteTableAssociation2:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: CreateVpc
+    Properties:
+      SubnetId: !Ref PublicSubnet2
+      RouteTableId: !Ref PublicRouteTable
+
+  PrivateRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: CreateVpc
+    Properties:
+      SubnetId: !Ref PrivateSubnet
+      RouteTableId: !Ref PrivateRouteTable
+
+  ##### Security
+  EC2SecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow traffic from ALB
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80  # Assuming container listens on 80
+          ToPort: 80
+          SourceSecurityGroupId: !Ref ALBSecurityGroup
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: !Ref EgressCidr
+
+  ALBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow internal and outbound traffic
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: !Ref IngressCidr
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 174.72.69.130/32
+      SecurityGroupEgress:
+        - IpProtocol: "-1"  # Allows all outbound traffic
+          CidrIp: 0.0.0.0/0
+
+  SSMInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service: "ec2.amazonaws.com"
+            Action: "sts:AssumeRole"
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  
+  ##### Load Balancing
+  ApplicationLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Subnets:
+        - !If [CreateVpc, !Ref PublicSubnet1, !Ref PublicSubnetId1]
+        - !If [CreateVpc, !Ref PublicSubnet2, !Ref PublicSubnetId2]
+      SecurityGroups:
+        - !Ref ALBSecurityGroup
+
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !If [CreateVpc, !Ref StackVPC, !Ref ExistingVpcId]
+      Port: 80
+      Protocol: HTTP
+      TargetType: instance
+      HealthCheckPath: "/health"
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+      LoadBalancerArn: !Ref ApplicationLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  ##### Compute
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref SSMInstanceRole
+
+  LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: MyLaunchTemplate
+      LaunchTemplateData:
+        ImageId: !Ref AMIId
+        InstanceType: !Ref InstanceType
+        SecurityGroupIds:
+          - !Ref EC2SecurityGroup
+        IamInstanceProfile:
+          Arn: !GetAtt InstanceProfile.Arn
+        UserData: !Base64 
+          'Fn::Sub': |
+            #!/bin/bash
+            yum update -y
+            yum install -y docker
+            service docker start
+            
+            # Login to Docker registry
+            echo "${003DockerRegistryPassword}" | docker login --username ${004DockerRegistryUsername} --password-stdin ${DockerRegistryUrl}
+            
+            # Pull and run Docker container
+            docker run -d \
+              -p 80:8000 \
+              -e WHYLABS_API_KEY=${001WhyLabsApiKey} \
+              -e CONTAINER_PASSWORD=${002WhyLabsContainerPassword} \
+              ${DockerRegistryUrl}/whylabs/whylogs-container:1.0.14
+    
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      LaunchTemplate:
+        LaunchTemplateId: !Ref LaunchTemplate
+        Version: !GetAtt LaunchTemplate.LatestVersionNumber
+      MinSize: !Ref ReplicaCount
+      MaxSize: !Ref ReplicaCount
+      TargetGroupARNs:
+        - !Ref TargetGroup
+      VPCZoneIdentifier:
+        - !If [CreateVpc, !Ref PrivateSubnet, !Ref PrivateSubnetId]
+
+Outputs:
+  LoadBalancerDNS:
+    Description: DNS of the Load Balancer
+    Value: !GetAtt ApplicationLoadBalancer.DNSName
