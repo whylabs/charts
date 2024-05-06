@@ -36,7 +36,7 @@ docker login registry.gitlab.com -u "${username}" -p "${password}"
 
 To change the number of replicas for the guardrails service:
 
-1. Open the docker-compose.yaml file.
+1. Open the `compose.yaml` file.
 
 1. Find the guardrails service section.
 
@@ -54,7 +54,7 @@ deploy:
 To modify the CPU and memory limits for the guardrails or nginx services:
 
 1. Navigate to the resources section under the respective service in the
-`docker-compose.yaml` file.
+`compose.yaml` file.
 
 1. Adjust the cpus and memory under both limits and reservations.
 
@@ -72,7 +72,7 @@ resources:
 To update the Docker image used by the guardrails service:
 
 1. Locate the image key under the guardrails service in the
-`docker-compose.yaml` file.
+`compose.yaml` file.
 
 1. Update the image name and tag.
 
@@ -83,20 +83,25 @@ image: registry.gitlab.com/whylabs/whylogs-container:newtag
 ```
 ## Running the Application
 
-To run the application, use the following command from the directory containing your docker-compose.yaml file:
+To run the application, use the following command from the directory containing
+your `compose.yaml` file.
+
+> :warning: It is important to execute `docker compose` commands from this
+directory, the one containing the `compose.yaml` file. The configuration expects
+the `nginx.conf` to be a sibling to the `compose.yaml` file.
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
-This will start all services defined in the Docker Compose file in detached mode.
+This will start all services defined in the Docker Compose file.
 
 ### Stopping the Application
 
 To stop all services, run:
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 ### Monitoring and Logs
@@ -104,7 +109,7 @@ docker-compose down
 To view the logs for a specific service, use:
 
 ```bash
-docker-compose logs -f guardrails
+docker compose logs -f guardrails
 ```
 
 Replace guardrails with nginx to view logs for the NGINX service.
