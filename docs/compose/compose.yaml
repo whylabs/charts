@@ -1,0 +1,54 @@
+name: guardrails
+services:
+
+  guardrails:
+    cap_drop:
+      - ALL
+    environment:
+      CONTAINER_PASSWORD: null
+      WHYLABS_API_KEY: null
+    image: registry.gitlab.com/whylabs/langkit-container:1.0.14
+    platform: linux/amd64
+    ports:
+      - target: 8000
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    user: 1000:1000
+    volumes:
+      - type: volume
+        source: temp-dir
+        target: /tmp
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 6144M
+        reservations:
+          cpus: '4.0'
+          memory: 6144M
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - guardrails
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf 
+      - type: tmpfs
+        target: /etc/nginx/conf.d
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '1.0'
+          memory: 1024M
+
+volumes:
+  temp-dir: {}
