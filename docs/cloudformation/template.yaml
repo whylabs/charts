@@ -233,13 +233,9 @@ Resources:
           FromPort: 80
           ToPort: 80
           CidrIp: !Ref IngressCidr
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 174.72.69.130/32
       SecurityGroupEgress:
         - IpProtocol: "-1"  # Allows all outbound traffic
-          CidrIp: 0.0.0.0/0
+          CidrIp: !Ref EgressCidr
 
   SSMInstanceRole:
     Type: AWS::IAM::Role
