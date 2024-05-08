@@ -2,7 +2,9 @@
 
 ## Prerequisites
 
-Before you start, make sure you have Docker and Docker Compose installed on your system. You will also need to clone the repository containing the Docker Compose file and related configuration files.
+Before you start, make sure you have Docker and Docker Compose installed on your
+system. You will also need to clone the repository containing the Docker Compose
+file and related configuration files.
 
 ## Configuration
 
@@ -10,7 +12,8 @@ Before you start, make sure you have Docker and Docker Compose installed on your
 
 Set the necessary environment variables before starting the application:
 
-- `CONTAINER_PASSWORD`: Password used internally by containers. Set this in your environment or directly in the Docker Compose file.
+- `CONTAINER_PASSWORD`: Password used internally by containers. Set this in your
+environment or directly in the Docker Compose file.
 - `WHYLABS_API_KEY`: API key for WhyLabs integration.
 
 Example:
@@ -63,8 +66,8 @@ Example for Guardrails:
 ```yaml
 resources:
   limits:
-    cpus: '2.0'  # From 4.0 to 2.0 for example
-    memory: 2048M  # From 4096M to 2048M for example
+    cpus: '6.0'  # From 4.0 to 6.0 for example
+    memory: 8192M  # From 6144M to 8192M for example
 ```
 
 ### Updating the Image and Tag
