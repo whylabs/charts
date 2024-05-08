@@ -20,16 +20,16 @@ services:
         source: temp-dir
         target: /tmp
     deploy:
-      replicas: 4
+      replicas: 3
       restart_policy:
         condition: on-failure
       resources:
         limits:
           cpus: '4.0'
-          memory: 4096M
+          memory: 6144M
         reservations:
           cpus: '4.0'
-          memory: 4096M
+          memory: 6144M
 
   nginx:
     image: nginx:latest
