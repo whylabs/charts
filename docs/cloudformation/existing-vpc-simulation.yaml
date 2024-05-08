@@ -1,22 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Deployment of Containerized Applications on EC2 Instances
 
-Parameters:
-  VpcCidr:
-    Type: String
-    Default: 10.199.0.0/16
-    Description: The CIDR block for the VPC.
-
-  AMIId:
-    Type: String
-    Default: ami-0ddda618e961f2270
-    Description: The ID of the AMI to be used for the EC2 instances.
-
 Resources:
   StackVPC:
     Type: AWS::EC2::VPC
     Properties:
-      CidrBlock: !Ref VpcCidr
+      CidrBlock: 10.199.0.0/16
       EnableDnsSupport: true
       EnableDnsHostnames: true
 
@@ -33,7 +22,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref StackVPC
-      CidrBlock: 10.199.5.0/24
+      CidrBlock: 10.199.0.0/28
       MapPublicIpOnLaunch: false
       AvailabilityZone: !Select 
         - 0
@@ -43,7 +32,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref StackVPC
-      CidrBlock: 10.199.1.0/24
+      CidrBlock: 10.199.0.16/28
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select 
         - 0
@@ -53,7 +42,7 @@ Resources:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref StackVPC
-      CidrBlock: 10.199.3.0/24
+      CidrBlock: 10.199.0.32/28
       MapPublicIpOnLaunch: true
       AvailabilityZone: !Select 
         - 1
@@ -114,7 +103,6 @@ Resources:
 
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
-    GroupName: !Sub "${AWS::StackName}-EC2-SG"
     Properties:
       GroupDescription: Allow traffic from ALB
       VpcId: !Ref StackVPC
@@ -122,11 +110,10 @@ Resources:
         - IpProtocol: tcp
           FromPort: 443
           ToPort: 443
-          CidrIp: !Ref VpcCidr
+          CidrIp: 10.199.0.0/16
 
   SSMInstanceRole:
     Type: AWS::IAM::Role
-    RoleName: !Sub "${AWS::StackName}-SSM-ROLE"
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -140,7 +127,6 @@ Resources:
 
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
-    InstanceProfileName: !Sub "${AWS::StackName}-EC2-PROFILE"
     Properties:
       Roles:
         - !Ref SSMInstanceRole
@@ -148,7 +134,7 @@ Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: !Ref AMIId
+      ImageId: ami-0ddda618e961f2270
       InstanceType: t3.medium
       SubnetId: !Ref PrivateSubnet
       SecurityGroupIds:
@@ -180,3 +166,9 @@ Outputs:
     Value: !Ref PublicSubnet2
     Export:
       Name: !Sub "${AWS::StackName}-PublicSubnetId2"
+
+  InstanceProfileArn:
+    Description: "The ARN of the instance profile role"
+    Value: !GetAtt InstanceProfile.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-InstanceProfile"

@@ -42,6 +42,11 @@ Parameters:
     Default: ""
     Description: Optional. Existing VPC ID to use instead of creating a new VPC. Leave empty to create a new VPC.
 
+  ExistingInstanceProfileArn:
+    Type: String
+    Default: ""
+    Description: Optional. Existing IAM instance profile ARN to use instead of creating a new instance profile. Leave empty to create a new instance profile.
+
   VpcCidr:
     Type: String
     Default: 10.0.0.0/16
@@ -89,9 +94,10 @@ Parameters:
 
 Conditions:
   CreateVpc: !Equals [!Ref ExistingVpcId, ""]
+  CreateInstanceProfile: !Equals [!Ref ExistingInstanceProfileArn, ""]
 
 Resources:
-  ##### Networking
+
   StackVPC:
     Type: AWS::EC2::VPC
     Condition: CreateVpc
@@ -206,7 +212,6 @@ Resources:
       SubnetId: !Ref PrivateSubnet
       RouteTableId: !Ref PrivateRouteTable
 
-  ##### Security
   EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -239,6 +244,7 @@ Resources:
 
   SSMInstanceRole:
     Type: AWS::IAM::Role
+    Condition: CreateInstanceProfile
     Properties:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
@@ -250,7 +256,6 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   
-  ##### Load Balancing
   ApplicationLoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -279,9 +284,9 @@ Resources:
       Port: 80
       Protocol: HTTP
 
-  ##### Compute
   InstanceProfile:
     Type: AWS::IAM::InstanceProfile
+    Condition: CreateInstanceProfile
     Properties:
       Roles:
         - !Ref SSMInstanceRole
@@ -296,7 +301,7 @@ Resources:
         SecurityGroupIds:
           - !Ref EC2SecurityGroup
         IamInstanceProfile:
-          Arn: !GetAtt InstanceProfile.Arn
+          Arn: !If [CreateInstanceProfile, !GetAtt InstanceProfile.Arn, !Ref ExistingInstanceProfileArn]
         UserData: !Base64 
           'Fn::Sub': |
             #!/bin/bash
