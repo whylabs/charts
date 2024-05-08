@@ -6,11 +6,11 @@ replicaCount: 2
 
 image:
   # -- Image repository for the `guardrails` container.
-  repository: registry.gitlab.com/whylabs/whylogs-container
+  repository: registry.gitlab.com/whylabs/langkit-container
   # -- Image pull policy for the `guardrails` container.
   pullPolicy: IfNotPresent
   # -- (string) Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set.
-  tag: 1.0.14
+  tag: ""
 
 imagePullSecrets:
   # -- (list) Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials`.
@@ -92,10 +92,10 @@ ingress:
 resources:
   requests:
     cpu: "4"
-    memory: 4Gi
+    memory: 6Gi
   limits:
     cpu: "4"
-    memory: 4Gi
+    memory: 6Gi
 
 # -- [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container.
 livenessProbe:
