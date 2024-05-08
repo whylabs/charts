@@ -23,7 +23,8 @@ helm diff upgrade \
   --allow-unreleased \
   --namespace <target-namespace> \
   `# Specify the .tgz file as the chart` \
-  {{ template "chart.name" . }} {{ template "chart.name" . }}-{{ template "chart.version" . }}.tgz
+  {{ template "chart.name" . }}
+  {{ template "chart.name" . }}-{{ template "chart.version" . }}.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -32,9 +33,9 @@ After you've installed the repo you can install the chart.
 helm upgrade --install \
   --create-namespace \
   --namespace <target-namespace> \
-  {{ template "chart.name" . }} {{ template "chart.name" . }}-{{ template "chart.version" . }}.tgz
+  {{ template "chart.name" . }}
+  {{ template "chart.name" . }}-{{ template "chart.version" . }}.tgz
 ```
-
 
 {{ template "chart.requirementsSection" . }}
 
