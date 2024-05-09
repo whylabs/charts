@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "guardrails.fullname" . }}
+  labels:
+    {{- include "guardrails.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "guardrails.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "guardrails.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      imagePullSecrets:
+      {{- if .Values.imagePullSecrets }}
+        {{- range .Values.imagePullSecrets }}
+          {{- if .name }}
+        - name: {{ .name }}
+          {{- else }}
+        - name: whylabs-{{ $.Release.Name }}-registry-credentials
+          {{- end }}
+        {{- end }}
+      {{- else }}
+        - name: whylabs-{{ .Release.Name }}-registry-credentials
+      {{- end }}
+      serviceAccountName: {{ include "guardrails.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.env }}
+          env:
+            {{- range $key, $value := .Values.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+          {{- end }}
+          envFrom:
+            - secretRef:
+                name: whylabs-{{ .Release.Name }}-api-key
+            - secretRef:
+                name: whylabs-{{ .Release.Name }}-api-secret
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: temp-dir
+              mountPath: /tmp
+            {{- if .Values.extraVolumeMounts }}
+              {{- with .extraVolumeMounts }}
+              {{- toYaml . | nindent 12 }}
+              {{- end }}
+            {{- end }}
+      volumes:
+        - name: temp-dir
+          emptyDir: {}
+      {{- if .Values.extraVolumes }}
+      {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

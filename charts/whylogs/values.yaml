@@ -1,3 +1,4 @@
+# -- Number of replicas for the service.
 replicaCount: 1
 
 image:

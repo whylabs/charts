@@ -52,5 +52,5 @@ jobs:
             ghcr_chart="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}/${chart_name}:${chart_version}"
             helm push "$chart" oci://ghcr.io/${{ github.repository_owner }}      
           done
-        shell: bash   
+        shell: bash
           
