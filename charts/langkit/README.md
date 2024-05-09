@@ -1,6 +1,6 @@
-# langkit
+# **:exclamation: This Helm Chart is deprecated! Please use the [GuardRails Chart](https://github.com/whylabs/charts/tree/mainline/charts/guardrails) instead**
 
-> **:exclamation: This Helm Chart is deprecated! Please use the [GuardRails Chart](https://github.com/whylabs/charts/tree/mainline/charts/guardrails) instead**
+# langkit
 
 ![Version: 0.16.0](https://img.shields.io/badge/Version-0.16.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.13](https://img.shields.io/badge/AppVersion-1.0.13-informational?style=flat-square)
 
