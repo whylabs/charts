@@ -104,7 +104,7 @@ helm uninstall \
 | readinessProbe.httpGet.port | int | `8000` |  |
 | readinessProbe.initialDelaySeconds | int | `30` |  |
 | readinessProbe.periodSeconds | int | `30` |  |
-| replicaCount | int | `1` |  |
+| replicaCount | int | `1` | Number of replicas for the service. |
 | resources | object | `{}` |  |
 | securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | securityContext.runAsUser | int | `1000` |  |

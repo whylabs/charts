@@ -1,5 +1,7 @@
 # langkit
 
+> **:exclamation: This Helm Chart is deprecated!**
+
 ![Version: 0.16.0](https://img.shields.io/badge/Version-0.16.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.13](https://img.shields.io/badge/AppVersion-1.0.13-informational?style=flat-square)
 
 A Helm chart for LangKit container deployment
@@ -120,7 +122,7 @@ helm uninstall \
 | readinessProbe.httpGet.port | int | `8000` |  |
 | readinessProbe.initialDelaySeconds | int | `30` |  |
 | readinessProbe.periodSeconds | int | `30` |  |
-| replicaCount | int | `2` |  |
+| replicaCount | int | `2` | Number of replicas for the service. |
 | resources.limits.cpu | string | `"4"` |  |
 | resources.limits.memory | string | `"4Gi"` |  |
 | resources.requests.cpu | string | `"4"` |  |
