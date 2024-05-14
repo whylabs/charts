@@ -1,6 +1,6 @@
 # guardrails
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.19](https://img.shields.io/badge/AppVersion-1.0.19-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.20-dev2](https://img.shields.io/badge/AppVersion-1.0.20--dev2-informational?style=flat-square)
 
 A Helm chart for WhyLabs Guardrails
 
@@ -10,14 +10,14 @@ A Helm chart for WhyLabs Guardrails
 # Downloads a .tgz file to the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/guardrails \
-  --version 0.1.0
+  --version 0.2.0
 
 helm diff upgrade \
   --allow-unreleased \
   --namespace <target-namespace> \
   `# Specify the .tgz file as the chart` \
   guardrails
-  guardrails-0.1.0.tgz
+  guardrails-0.2.0.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -27,15 +27,45 @@ helm upgrade --install \
   --create-namespace \
   --namespace <target-namespace> \
   guardrails
-  guardrails-0.1.0.tgz
+  guardrails-0.2.0.tgz
 ```
+
+## Horizontal Pod Autoscaling (HPA)
+
+The Horizontal Pod Autoscaler automatically scales the number of pods in a
+replication controller, deployment, replica set or stateful set based on
+observed CPU utilization (or, with custom metrics support, on some other
+application-provided metrics). The Horizontal Pod Autoscaler uses the following
+formula to calculate the desired number of pods:
+
+```text
+Desired Replicas = [ (Current Utilization / Target Utilization) * Current Replicas ]
+```
+
+For example, if an HPA is configured with a target CPU utilization of 50%, there
+are currently 3 pods, and the current average CPU utilization is 90%, the number
+of replicas will be scaled to 6:
+
+```text
+Desired Replicas = ⌈ (90% / 50%) * 3 ⌉
+                 = ⌈ 1.8 * 3 ⌉
+                 = ⌈ 5.4 ⌉
+                 = 6
+```
+
+HPA uses the same formula for both increasing and decreasing the number of pods.
+Horizontal pod scaling is disabled by default. To enable it, set the
+`hpa.enabled` key to `true`. The pods QoS class will impact HPA behavior as a
+deployment that is allowed to burst CPU usage will cause more aggressive HPA
+scaling than a deployment with a `Guaranteed` QoS that does not go above 100%
+utilization.
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity settings for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). If an explicit label selector is not provided for pod affinity or pod anti-affinity one will be created from the pod selector labels. |
-| autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":80}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
+| autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":70}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
 | commonLabels | object | `{}` | Labels to add to all chart resources. |
 | env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
 | extraVolumeMounts | list | `[]` | Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container. |
@@ -53,8 +83,8 @@ helm upgrade --install \
 | podLabels | object | `{}` | Labels to add to the `Pod`. |
 | podSecurityContext | object | `{"runAsNonRoot":true}` | [Pod security context](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core), this supports full customisation. |
 | readinessProbe | object | `{"failureThreshold":10,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":30,"periodSeconds":30}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
-| replicaCount | int | `2` | Number of replicas for the service. |
-| resources | object | `{"limits":{"cpu":"4","memory":"6Gi"},"requests":{"cpu":"4","memory":"6Gi"}}` | [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container. |
+| replicaCount | int | `4` | Number of replicas for the service. |
+| resources | object | `{"limits":{"cpu":"4","ephemeral-storage":"250Mi","memory":"4Gi"},"requests":{"cpu":"4","ephemeral-storage":"250Mi","memory":"4Gi"}}` | [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container. |
 | securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for the `guardrails` container. |
 | service.annotations | object | `{}` | Service annotations. |
 | service.port | int | `80` | Service HTTP port. |

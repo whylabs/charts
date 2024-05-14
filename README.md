@@ -76,3 +76,16 @@ helm uninstall \
   --namespace "${namespace}" \
   "${release}"
 ```
+
+## Development
+
+### Pre-Commit
+
+#### Troubleshooting
+
+Try executing `pre-commit` manually if it fails on commit:
+
+```shell
+git add .
+pre-commit run --all-files
+```
