@@ -24,8 +24,43 @@ jobs:
         with:
           version: v3.14.0
 
+      # - name: YAML Lint
+      #   if: github.event_name == 'pull_request'
+      #   uses: actionshub/yaml-lint@v1
+      #   with:
+      #     directory: .
+      
+      # - name: Helm Lint
+      #   if: github.event_name == 'pull_request'
+      #   working-directory: ${{ github.workspace }}/charts
+      #   run: |
+      #     for dir in */ ; do
+      #       if [ -f "$dir/Chart.yaml" ]; then
+      #         helm lint "$dir"
+      #       fi
+      #     done
+      #   shell: bash
+
+      # - name: Markdown Lint
+      #   if: github.event_name == 'pull_request'
+      #   uses: github/super-linter@v4
+      #   env:
+      #     DEFAULT_BRANCH: mainline
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     VALIDATE_MARKDOWN: true
+
+      - name: Update Chart Version for PRs
+        if: github.event_name == 'pull_request'
+        working-directory: ${{ github.workspace }}/charts
+        run: |
+          for dir in */ ; do
+            if [ -f "$dir/Chart.yaml" ]; then
+              yq eval '.version += "-dev"' -i "$dir/Chart.yaml"
+            fi
+          done
+        shell: bash
+
       - name: Package All Helm Charts
-        if: github.event_name == 'push'
         working-directory: ${{ github.workspace }}/charts
         run: |
           for dir in */ ; do
@@ -36,21 +71,19 @@ jobs:
         shell: bash
 
       - name: Login to GHCR
-        if: github.event_name == 'push'
         run: |
-          docker login ghcr.io \
-            -u ${{ github.repository_owner }} \
-            --password-stdin < <(echo "${{ secrets.GITHUB_TOKEN }}")
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
       - name: Publish Helm Charts to GHCR
-        if: github.event_name == 'push'
         working-directory: ${{ github.workspace }}/charts
         run: |
           for chart in *.tgz ; do
             chart_name=$(basename "$chart" .tgz)
             chart_version=$(echo "$chart_name" | sed 's/.*-//')
+            if [ "${{ github.event_name }}" == "pull_request" ]; then
+              chart_version="${chart_version}-dev"
+            fi
             ghcr_chart="ghcr.io/${{ github.repository_owner }}/${{ github.repository }}/${chart_name}:${chart_version}"
-            helm push "$chart" oci://ghcr.io/${{ github.repository_owner }}      
+            helm push "$chart" oci://ghcr.io/${{ github.repository_owner }}"
           done
         shell: bash
-          
