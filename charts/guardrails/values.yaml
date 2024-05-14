@@ -1,5 +1,5 @@
 # -- Number of replicas for the service.
-replicaCount: 2
+replicaCount: 4
 
 image:
   # -- Image repository for the `guardrails` container.
@@ -89,10 +89,12 @@ ingress:
 resources:
   requests:
     cpu: "4"
-    memory: 6Gi
+    memory: 4Gi
+    ephemeral-storage: 250Mi
   limits:
     cpu: "4"
-    memory: 6Gi
+    memory: 4Gi
+    ephemeral-storage: 250Mi
 
 # -- [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container.
 livenessProbe:
@@ -117,8 +119,8 @@ autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  targetCPUUtilizationPercentage: 70
+  # targetMemoryUtilizationPercentage: 70
 
 # -- Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`.
 extraVolumes: []

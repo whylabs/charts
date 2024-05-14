@@ -2,5 +2,5 @@ apiVersion: v2
 name: guardrails
 description: A Helm chart for WhyLabs Guardrails
 type: application
-version: 0.1.0
-appVersion: "1.0.19"
+version: 0.2.0
+appVersion: "1.0.20-dev2"
