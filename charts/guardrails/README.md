@@ -4,20 +4,69 @@
 
 A Helm chart for WhyLabs Guardrails
 
-## Installing the Chart
+## Prerequisites
+
+### API Key
+
+Create a [WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-api/#creating-an-api-token)
+that will be used when creating the required Kubernetes secrets to authenticate
+with the WhyLabs API.
+
+### Secrets
+
+Use the following `kubectl` commands to create the required Kubernetes
+`Secrets`. These secrets must exist prior to installing the Helm chart.
 
 ```shell
-# Downloads a .tgz file to the working directory or --destination path
+# API that was created above
+whylabs_api_key=""
+# Arbitrary value that will be required to make requests to the containers
+container_password=""
+# Change this to the desired namespace
+target_namespace="default"
+
+kubectl create secret generic whylabs-<helm-release-name>-api-key \
+  --namespace "${target_namespace}" \
+  --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
+
+kubectl create secret generic whylabs-<helm-release-name>-api-secret \
+  --namespace "${target_namespace}" \
+  --from-literal=CONTAINER_PASSWORD="${container_password}"
+
+kubectl create secret docker-registry whylabs-<helm-release-name>-registry-credentials \
+  --namespace "${target_namespace}" \
+  --docker-server="registry.gitlab.com" \
+  --docker-username="<whylabs-provided-username>" \
+  --docker-password="<whylabs-provided-token>" \
+  --docker-email="<whylabs-provided-email>"
+```
+
+## Installation & Upgrades
+
+### How to Use WhyLabs Helm Repository
+
+> :warning: WhyLab's Helm charts are hosted on GitHub Container Registry (GHCR),
+> an OCI-compliant storage solution. GHCR aligns with industry standards for
+> container artifact storage and has a slightly different API to be aware of.
+> Use the `helm pull` command to download the a `.tgz` archive of the chart.
+> Reference the `.tgz` archive as the chart identifier when installing.
+
+```shell
+# Specify the namespace to install the chart into
+target_namespace=""
+
+# The following command will download a guardrails-${chart_version}.tgz file to
+# the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/guardrails \
   --version 0.2.0
 
+# Requires the helm-diff plugin to be installed:
+# helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
-  --namespace <target-namespace> \
-  `# Specify the .tgz file as the chart` \
-  guardrails
-  guardrails-0.2.0.tgz
+  --namespace "${target_namespace}" \
+  guardrails guardrails-0.2.0.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -25,9 +74,8 @@ After you've installed the repo you can install the chart.
 ```shell
 helm upgrade --install \
   --create-namespace \
-  --namespace <target-namespace> \
-  guardrails
-  guardrails-0.2.0.tgz
+  --namespace "${target_namespace}" \
+  guardrails guardrails-0.2.0.tgz
 ```
 
 ## Horizontal Pod Autoscaling (HPA)
