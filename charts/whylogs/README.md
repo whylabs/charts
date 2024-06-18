@@ -4,58 +4,71 @@
 
 A Helm chart for WhyLab's WhyLogs
 
-See [WhyLogs Documentation](https://docs.whylabs.ai/docs/integrations-whylogs-container/) for more information
-
-> :warning: Review the [documentation on using WhyLab's Helm charts](../../README.md#how-to-use-whylabs-helm-repository)
+> :mag: See [WhyLogs Documentation](https://docs.whylabs.ai/docs/integrations-whylogs-container/) for more information
 
 ## Prerequisites
 
+### API Key
+
+Create a [WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-api/#creating-an-api-token)
+that will be used when creating the required Kubernetes secrets to authenticate
+with the WhyLabs API.
+
 ### Secrets
 
-The following configured secrets must exist in the cluster prior to deploying
-the WhyLogs Helm chart.
-
-Create a [WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-capabilities/#access-token-management)
-which must be stored in a `whylabs-api-key` Kubernetes secret, described below.
+Use the following `kubectl` commands to create the required Kubernetes
+`Secrets`. These secrets must exist prior to installing the Helm chart.
 
 ```shell
+# API that was created above
 whylabs_api_key=""
-whylogs_password=""
-namespace="default"
+# Arbitrary value that will be required to make requests to the containers
+container_password=""
+# Change this to the desired namespace
+target_namespace="default"
 
 kubectl create secret generic whylabs-api-key \
-  --namespace "${namespace}" \
-  --from-literal=api-key="${whylabs_api_key}"
+  --namespace "${target_namespace}" \
+  --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
 
 kubectl create secret generic whylogs-container-password \
-  --namespace "${namespace}" \
-  --from-literal=passwordy="${whylogs_password}"
+  --namespace "${target_namespace}" \
+  --from-literal=CONTAINER_PASSWORD="${container_password}"
 ```
 
-## Deployment
+## Installation & Upgrades
 
-### Diff
-View the difference between the current state and desired state.
+### How to Use WhyLabs Helm Repository
+
+> :warning: WhyLab's Helm charts are hosted on GitHub Container Registry (GHCR),
+> an OCI-compliant storage solution. GHCR aligns with industry standards for
+> container artifact storage and has a slightly different API to be aware of.
+> Use the `helm pull` command to download the a `.tgz` archive of the chart.
+> Reference the `.tgz` archive as the chart identifier when installing.
 
 ```shell
+# Specify the namespace to install the chart into
+target_namespace=""
+
+# The following command will download a guardrails-${chart_version}.tgz file to
+# the working directory or --destination path
+helm pull \
+  oci://ghcr.io/whylabs/whylogs \
+  --version 0.1.0
+
 # Requires the helm-diff plugin to be installed:
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
-  whylogs "whylogs-0.1.0.tgz"
+  --namespace "${target_namespace}" \
+  whylogs whylogs-0.1.0.tgz
 ```
 
-### Install/Update
+After you've installed the repo you can install the chart.
+
 ```shell
 helm upgrade --install \
   --create-namespace \
-  --namespace "${namespace}" \
-  whylogs "whylogs-0.1.0.tgz"
-```
-
-### Uninstall
-```shell
-helm uninstall \
   --namespace "${namespace}" \
   whylogs "whylogs-0.1.0.tgz"
 ```
