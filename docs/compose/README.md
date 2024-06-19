@@ -12,15 +12,19 @@ file and related configuration files.
 
 Set the necessary environment variables before starting the application:
 
-- `CONTAINER_PASSWORD`: Password used internally by containers. Set this in your
-environment or directly in the Docker Compose file.
+- `CONTAINER_PASSWORD`: Password used internally by containers. Set this in your environment or directly in the Docker Compose file.
 - `WHYLABS_API_KEY`: API key for WhyLabs integration.
+- `AUTO_PULL_WHYLABS_POLICY_MODEL_IDS`: A csv value of the model ids that you want automatically sync the WhyLabs platform metric policy
+  from.
 
 Example:
 
 ```bash
 export CONTAINER_PASSWORD=yourpassword
 export WHYLABS_API_KEY=yourapikey
+
+# Optional
+export AUTO_PULL_WHYLABS_POLICY_MODEL_IDS=model-1
 ```
 
 ### Logging into GitLab Container Registry
