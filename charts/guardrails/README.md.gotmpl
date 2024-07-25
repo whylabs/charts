@@ -31,16 +31,18 @@ whylabs_api_key=""
 container_password=""
 # Change this to the desired namespace
 target_namespace="default"
+# Helm release name (See installation for release_name usage)
+release_name=""
 
-kubectl create secret generic whylabs-<helm-release-name>-api-key \
+kubectl create secret generic "whylabs-${release_name}-api-key" \
   --namespace "${target_namespace}" \
   --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
 
-kubectl create secret generic whylabs-<helm-release-name>-api-secret \
+kubectl create secret generic "whylabs-${release_name}-api-secret" \
   --namespace "${target_namespace}" \
   --from-literal=CONTAINER_PASSWORD="${container_password}"
 
-kubectl create secret docker-registry whylabs-<helm-release-name>-registry-credentials \
+kubectl create secret docker-registry "whylabs-${release_name}-registry-credentials" \
   --namespace "${target_namespace}" \
   --docker-server="registry.gitlab.com" \
   --docker-username="<whylabs-provided-username>" \
@@ -49,6 +51,18 @@ kubectl create secret docker-registry whylabs-<helm-release-name>-registry-crede
 ```
 
 ## Installation & Upgrades
+
+> :warning: If you intend to expose the WhyLabs Guardrails service to the public
+internet, you will need an Ingress Controller such as
+[NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/), a
+Gateway Controller such as [Ambassador](https://www.getambassador.io/), a
+Service Mesh such as [Istio](https://istio.io/), or a Load Balancer Controller
+such as [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller).
+The installation and configuration of the aforementioned controllers are outside
+the scope of this document. However, for a quickstart guide to expose Guardrails
+to the public internet via AWS LBC, see the
+[Exposing Guardrails to the Public Internet](#exposing-guardrails-to-the-public-internet)
+section.
 
 ### How to Use WhyLabs Helm Repository
 
@@ -61,6 +75,8 @@ kubectl create secret docker-registry whylabs-<helm-release-name>-registry-crede
 ```shell
 # Specify the namespace to install the chart into
 target_namespace=""
+# Helm release name
+release_name=""
 
 # The following command will download a guardrails-${chart_version}.tgz file to
 # the working directory or --destination path
@@ -73,7 +89,7 @@ helm pull \
 helm diff upgrade \
   --allow-unreleased \
   --namespace "${target_namespace}" \
-  {{ template "chart.name" . }} {{ template "chart.name" . }}-{{ template "chart.version" . }}.tgz
+  "${release_name}" {{ template "chart.name" . }}-{{ template "chart.version" . }}.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -82,7 +98,37 @@ After you've installed the repo you can install the chart.
 helm upgrade --install \
   --create-namespace \
   --namespace "${target_namespace}" \
-  {{ template "chart.name" . }} {{ template "chart.name" . }}-{{ template "chart.version" . }}.tgz
+  "${release_name}" {{ template "chart.name" . }}-{{ template "chart.version" . }}.tgz
+```
+
+## Exposing Guardrails to the Public Internet
+
+This section serves as a quickstart guide to install AWS LBC and configure the
+Helm chart to expose Guardrails to the public internet via an NLB.
+
+1. [Install AWS LBC](https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/deploy/installation/)
+1. Modify the `values.yaml` file:
+    1. Change `service.type` to `LoadBalancer`
+    1. Set `service.annotations` to the appropriate annotations for your desired
+  load balancer configuration. 
+
+The following `values.yaml` service configuration will create a Network
+Load Balancer (NLB) that resolves to public IP addresses and registers the Pod
+IPs as load balancer targets:
+
+```yaml
+service:
+  annotations:
+	  # Explicitly delegate LB controll to AWS Load Balancer Controller
+	  service.beta.kubernetes.io/aws-load-balancer-type: "external"
+	  # Create an NLB that resolves to public IP addresses
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    # Register the Pods IPs as load balancer targets
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    # Use TCP protocol for traffic between NLB and Pods
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+	# Must be of type LoadBalancer
+  type: LoadBalancer
 ```
 
 ## Horizontal Pod Autoscaling (HPA)

@@ -24,8 +24,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- if gt (len .Values.imagePullSecrets) 0 }}
       imagePullSecrets:
-      {{- if .Values.imagePullSecrets }}
         {{- range .Values.imagePullSecrets }}
           {{- if .name }}
         - name: {{ .name }}
@@ -33,8 +33,6 @@ spec:
         - name: whylabs-{{ $.Release.Name }}-registry-credentials
           {{- end }}
         {{- end }}
-      {{- else }}
-        - name: whylabs-{{ .Release.Name }}-registry-credentials
       {{- end }}
       serviceAccountName: {{ include "guardrails.serviceAccountName" . }}
       securityContext:
