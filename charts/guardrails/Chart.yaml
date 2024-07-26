@@ -3,4 +3,4 @@ name: guardrails
 description: A Helm chart for WhyLabs Guardrails
 type: application
 version: 0.2.1
-appVersion: "1.0.20-dev2"
+appVersion: "1.0.23"

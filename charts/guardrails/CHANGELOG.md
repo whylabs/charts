@@ -10,7 +10,8 @@ and this project adheres to [Semantic Versioning]
 
 ### Updated
 
-- Allow `imagePullSecrets` to be excluded from the `Deployment` if set to `[]`.
+- Default image tag from `1.0.20-dev2` to `1.0.23`
+- Allow `imagePullSecrets` to be excluded from the `Deployment` if set to `[]`
 
 ## [0.2.0] - 2024-05-14
 
