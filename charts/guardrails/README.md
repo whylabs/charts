@@ -45,8 +45,8 @@ kubectl create secret docker-registry "whylabs-${release_name}-registry-credenti
 
 ## Installation & Upgrades
 
-> :warning: If you intend to expose the WhyLabs Guardrails service to the public
-internet, you will need an Ingress Controller such as
+> :warning: To expose guardrails to callers outside of your K8s cluster you will
+need an Ingress Controller such as
 [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/), a
 Gateway Controller such as [Ambassador](https://www.getambassador.io/), a
 Service Mesh such as [Istio](https://istio.io/), or a Load Balancer Controller
@@ -54,7 +54,7 @@ such as [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-loa
 The installation and configuration of the aforementioned controllers are outside
 the scope of this document. However, for a quickstart guide to expose Guardrails
 to the public internet via AWS LBC, see the
-[Exposing Guardrails to the Public Internet](#exposing-guardrails-to-the-public-internet)
+[Exposing Guardrails Outside Kubernetes](#exposing-guardrails-outside-kubernetes)
 section.
 
 ### How to Use WhyLabs Helm Repository
@@ -94,10 +94,11 @@ helm upgrade --install \
   "${release_name}" guardrails-0.2.1.tgz
 ```
 
-## Exposing Guardrails to the Public Internet
+## Exposing Guardrails Outside Kubernetes
 
 This section serves as a quickstart guide to install AWS LBC and configure the
-Helm chart to expose Guardrails to the public internet via an NLB.
+Helm chart to expose Guardrails outside of your Kubernetes cluster via an
+internal NLB.
 
 1. [Install AWS LBC](https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/deploy/installation/)
 1. Modify the `values.yaml` file:
@@ -106,7 +107,7 @@ Helm chart to expose Guardrails to the public internet via an NLB.
   load balancer configuration.
 
 The following `values.yaml` service configuration will create a Network
-Load Balancer (NLB) that resolves to public IP addresses and registers the Pod
+Load Balancer (NLB) that resolves to private IP addresses and registers the Pod
 IPs as load balancer targets:
 
 ```yaml
@@ -115,7 +116,7 @@ service:
     # Explicitly delegate LB controll to AWS Load Balancer Controller
     service.beta.kubernetes.io/aws-load-balancer-type: "external"
     # Create an NLB that resolves to public IP addresses
-    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
     # Register the Pods IPs as load balancer targets
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
     # Use TCP protocol for traffic between NLB and Pods
