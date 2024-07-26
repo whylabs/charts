@@ -1,6 +1,6 @@
 # guardrails
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.20-dev2](https://img.shields.io/badge/AppVersion-1.0.20--dev2-informational?style=flat-square)
+![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.23](https://img.shields.io/badge/AppVersion-1.0.23-informational?style=flat-square)
 
 A Helm chart for WhyLabs Guardrails
 
@@ -24,16 +24,18 @@ whylabs_api_key=""
 container_password=""
 # Change this to the desired namespace
 target_namespace="default"
+# Helm release name (See installation for release_name usage)
+release_name=""
 
-kubectl create secret generic whylabs-<helm-release-name>-api-key \
+kubectl create secret generic "whylabs-${release_name}-api-key" \
   --namespace "${target_namespace}" \
   --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
 
-kubectl create secret generic whylabs-<helm-release-name>-api-secret \
+kubectl create secret generic "whylabs-${release_name}-api-secret" \
   --namespace "${target_namespace}" \
   --from-literal=CONTAINER_PASSWORD="${container_password}"
 
-kubectl create secret docker-registry whylabs-<helm-release-name>-registry-credentials \
+kubectl create secret docker-registry "whylabs-${release_name}-registry-credentials" \
   --namespace "${target_namespace}" \
   --docker-server="registry.gitlab.com" \
   --docker-username="<whylabs-provided-username>" \
@@ -42,6 +44,18 @@ kubectl create secret docker-registry whylabs-<helm-release-name>-registry-crede
 ```
 
 ## Installation & Upgrades
+
+> :warning: To expose guardrails to callers outside of your K8s cluster you will
+need an Ingress Controller such as
+[NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/), a
+Gateway Controller such as [Ambassador](https://www.getambassador.io/), a
+Service Mesh such as [Istio](https://istio.io/), or a Load Balancer Controller
+such as [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller).
+The installation and configuration of the aforementioned controllers are outside
+the scope of this document. However, for a quickstart guide to expose Guardrails
+to the public internet via AWS LBC, see the
+[Exposing Guardrails Outside Kubernetes](#exposing-guardrails-outside-kubernetes)
+section.
 
 ### How to Use WhyLabs Helm Repository
 
@@ -54,19 +68,21 @@ kubectl create secret docker-registry whylabs-<helm-release-name>-registry-crede
 ```shell
 # Specify the namespace to install the chart into
 target_namespace=""
+# Helm release name
+release_name=""
 
 # The following command will download a guardrails-${chart_version}.tgz file to
 # the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/guardrails \
-  --version 0.2.0
+  --version 0.2.1
 
 # Requires the helm-diff plugin to be installed:
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
   --namespace "${target_namespace}" \
-  guardrails guardrails-0.2.0.tgz
+  "${release_name}" guardrails-0.2.1.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -75,7 +91,38 @@ After you've installed the repo you can install the chart.
 helm upgrade --install \
   --create-namespace \
   --namespace "${target_namespace}" \
-  guardrails guardrails-0.2.0.tgz
+  "${release_name}" guardrails-0.2.1.tgz
+```
+
+## Exposing Guardrails Outside Kubernetes
+
+This section serves as a quickstart guide to install AWS LBC and configure the
+Helm chart to expose Guardrails outside of your Kubernetes cluster via an
+internal NLB.
+
+1. [Install AWS LBC](https://kubernetes-sigs.github.io/aws-load-balancer-controller/latest/deploy/installation/)
+1. Modify the `values.yaml` file:
+    1. Change `service.type` to `LoadBalancer`
+    1. Set `service.annotations` to the appropriate annotations for your desired
+  load balancer configuration.
+
+The following `values.yaml` service configuration will create a Network
+Load Balancer (NLB) that resolves to private IP addresses and registers the Pod
+IPs as load balancer targets:
+
+```yaml
+service:
+  annotations:
+    # Explicitly delegate LB controll to AWS Load Balancer Controller
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    # Create an NLB that resolves to public IP addresses
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internal"
+    # Register the Pods IPs as load balancer targets
+    service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
+    # Use TCP protocol for traffic between NLB and Pods
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+  # Must be of type LoadBalancer
+  type: LoadBalancer
 ```
 
 ## Horizontal Pod Autoscaling (HPA)
@@ -122,7 +169,7 @@ utilization.
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the `guardrails` container. |
 | image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` | Image repository for the `guardrails` container. |
 | image.tag | string | `""` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
-| imagePullSecrets[0] | list | `{"name":""}` | Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials`. |
+| imagePullSecrets[0] | list | `{"name":""}` | Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials` if `name: ""`. To exclude The ImagePullSecret entirely, set `imagePullSecrets: []` and comment out the list items. |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}],"tls":[]}` | [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) configuration for the `guardrails` container. |
 | livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":30,"periodSeconds":30}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
 | nameOverride | string | `""` | Override the name of the chart. |

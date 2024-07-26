@@ -6,11 +6,15 @@ image:
   repository: registry.gitlab.com/whylabs/langkit-container
   # -- Image pull policy for the `guardrails` container.
   pullPolicy: IfNotPresent
-  # -- (string) Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set.
+  # -- (string) Image tag for the `guardrails` container, this will default to
+  # `.Chart.AppVersion` if not set.
   tag: ""
 
 imagePullSecrets:
-  # -- (list) Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials`.
+  # -- (list) Image pull secrets for the `guardrails` container. Defaults to
+  # `whylabs-{{ .Release.Name }}-registry-credentials` if `name: ""`. To exclude
+  # The ImagePullSecret entirely, set `imagePullSecrets: []` and comment out the
+  # list items.
   - name: ""
 
 # -- (string) Override the name of the chart.
