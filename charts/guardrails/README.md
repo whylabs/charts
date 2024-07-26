@@ -112,15 +112,15 @@ IPs as load balancer targets:
 ```yaml
 service:
   annotations:
-	  # Explicitly delegate LB controll to AWS Load Balancer Controller
-	  service.beta.kubernetes.io/aws-load-balancer-type: "external"
-	  # Create an NLB that resolves to public IP addresses
+    # Explicitly delegate LB controll to AWS Load Balancer Controller
+    service.beta.kubernetes.io/aws-load-balancer-type: "external"
+    # Create an NLB that resolves to public IP addresses
     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
     # Register the Pods IPs as load balancer targets
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
     # Use TCP protocol for traffic between NLB and Pods
     service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
-	# Must be of type LoadBalancer
+  # Must be of type LoadBalancer
   type: LoadBalancer
 ```
 
