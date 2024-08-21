@@ -164,15 +164,15 @@ utilization.
 | backend.enabled | bool | `true` |  |
 | backend.env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
 | backend.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the `guardrails` container. |
-| backend.image.repository | string | `"public.ecr.aws/whylabs-dev/pause"` | Image repository for the `guardrails` container. |
-| backend.image.tag | string | `"service"` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
-| backend.livenessProbe | object | `{}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
+| backend.image.repository | string | `"207285235248.dkr.ecr.us-west-2.amazonaws.com/guardrails-backend"` | Image repository for the `guardrails` container. |
+| backend.image.tag | string | `"latest"` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
+| backend.livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/status","port":8080},"initialDelaySeconds":30,"periodSeconds":30}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
 | backend.podAnnotations | object | `{}` | Annotations to add to the `Pod`. |
 | backend.podLabels | object | `{}` | Labels to add to the `Pod`. |
 | backend.podSecurityContext | object | `{"runAsNonRoot":true}` | [Pod security context](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core), this supports full customisation. |
-| backend.readinessProbe | object | `{}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
+| backend.readinessProbe | object | `{"failureThreshold":10,"httpGet":{"path":"/status","port":8080},"initialDelaySeconds":30,"periodSeconds":30}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
 | backend.replicaCount | int | `1` |  |
-| backend.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"250Mi","memory":"500Mi"},"requests":{"cpu":"500m","ephemeral-storage":"250Mi","memory":"500Mi"}}` | [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container. |
+| backend.resources | object | `{"limits":{"cpu":"1","ephemeral-storage":"250Mi","memory":"1Gi"},"requests":{"cpu":"1","ephemeral-storage":"250Mi","memory":"1Gi"}}` | [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container. |
 | backend.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for the `guardrails` container. |
 | backend.service.annotations | object | `{}` | Service annotations. |
 | backend.service.port | int | `80` | Service HTTP port. |
