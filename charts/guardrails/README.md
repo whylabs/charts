@@ -1,6 +1,6 @@
 # guardrails
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.23](https://img.shields.io/badge/AppVersion-1.0.23-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.23](https://img.shields.io/badge/AppVersion-1.0.23-informational?style=flat-square)
 
 A Helm chart for WhyLabs Guardrails
 
@@ -75,14 +75,14 @@ release_name=""
 # the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/guardrails \
-  --version 0.2.1
+  --version 0.3.0
 
 # Requires the helm-diff plugin to be installed:
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.2.1.tgz
+  "${release_name}" guardrails-0.3.0.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -91,7 +91,7 @@ After you've installed the repo you can install the chart.
 helm upgrade --install \
   --create-namespace \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.2.1.tgz
+  "${release_name}" guardrails-0.3.0.tgz
 ```
 
 ## Exposing Guardrails Outside Kubernetes
@@ -161,14 +161,31 @@ utilization.
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity settings for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). If an explicit label selector is not provided for pod affinity or pod anti-affinity one will be created from the pod selector labels. |
 | autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":70}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
+| backend.enabled | bool | `true` |  |
+| backend.env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
+| backend.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the `guardrails` container. |
+| backend.image.repository | string | `"207285235248.dkr.ecr.us-west-2.amazonaws.com/guardrails-backend"` | Image repository for the `guardrails` container. |
+| backend.image.tag | string | `"latest"` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
+| backend.livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/status","port":8080},"initialDelaySeconds":30,"periodSeconds":30}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
+| backend.podAnnotations | object | `{}` | Annotations to add to the `Pod`. |
+| backend.podLabels | object | `{}` | Labels to add to the `Pod`. |
+| backend.podSecurityContext | object | `{"runAsNonRoot":true}` | [Pod security context](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core), this supports full customisation. |
+| backend.readinessProbe | object | `{"failureThreshold":10,"httpGet":{"path":"/status","port":8080},"initialDelaySeconds":30,"periodSeconds":30}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
+| backend.replicaCount | int | `1` |  |
+| backend.resources | object | `{"limits":{"cpu":"1","ephemeral-storage":"250Mi","memory":"1Gi"},"requests":{"cpu":"1","ephemeral-storage":"250Mi","memory":"1Gi"}}` | [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container. |
+| backend.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for the `guardrails` container. |
+| backend.service.annotations | object | `{}` | Service annotations. |
+| backend.service.port | int | `80` | Service HTTP port. |
+| backend.service.targetPort | int | `8080` | The port on which the application container is listening. |
+| backend.service.type | string | `"ClusterIP"` | Service Type, i.e. ClusterIp, LoadBalancer, etc. |
 | commonLabels | object | `{}` | Labels to add to all chart resources. |
 | env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
 | extraVolumeMounts | list | `[]` | Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container. |
 | extraVolumes | list | `[]` | Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`. |
 | fullnameOverride | string | `""` | Override the full name of the chart. |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the `guardrails` container. |
-| image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` | Image repository for the `guardrails` container. |
-| image.tag | string | `""` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
+| image.repository | string | `"207285235248.dkr.ecr.us-west-2.amazonaws.com/guardrails"` | Image repository for the `guardrails` container. |
+| image.tag | string | `"1.0.23"` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
 | imagePullSecrets[0] | list | `{"name":""}` | Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials` if `name: ""`. To exclude The ImagePullSecret entirely, set `imagePullSecrets: []` and comment out the list items. |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}],"tls":[]}` | [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) configuration for the `guardrails` container. |
 | livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":30,"periodSeconds":30}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
