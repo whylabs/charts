@@ -184,8 +184,8 @@ utilization.
 | extraVolumes | list | `[]` | Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`. |
 | fullnameOverride | string | `""` | Override the full name of the chart. |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the `guardrails` container. |
-| image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` | Image repository for the `guardrails` container. |
-| image.tag | string | `""` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
+| image.repository | string | `"207285235248.dkr.ecr.us-west-2.amazonaws.com/guardrails"` | Image repository for the `guardrails` container. |
+| image.tag | string | `"1.0.23"` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
 | imagePullSecrets[0] | list | `{"name":""}` | Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials` if `name: ""`. To exclude The ImagePullSecret entirely, set `imagePullSecrets: []` and comment out the list items. |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}],"tls":[]}` | [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) configuration for the `guardrails` container. |
 | livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":30,"periodSeconds":30}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |

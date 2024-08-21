@@ -3,12 +3,12 @@ replicaCount: 4
 
 image:
   # -- Image repository for the `guardrails` container.
-  repository: registry.gitlab.com/whylabs/langkit-container
+  repository: 207285235248.dkr.ecr.us-west-2.amazonaws.com/guardrails
   # -- Image pull policy for the `guardrails` container.
   pullPolicy: IfNotPresent
   # -- (string) Image tag for the `guardrails` container, this will default to
   # `.Chart.AppVersion` if not set.
-  tag: ""
+  tag: "1.0.23"
 
 imagePullSecrets:
   # -- (list) Image pull secrets for the `guardrails` container. Defaults to
