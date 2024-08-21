@@ -1,6 +1,6 @@
 # guardrails
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.23](https://img.shields.io/badge/AppVersion-1.0.23-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.23](https://img.shields.io/badge/AppVersion-1.0.23-informational?style=flat-square)
 
 A Helm chart for WhyLabs Guardrails
 
@@ -75,14 +75,14 @@ release_name=""
 # the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/guardrails \
-  --version 0.2.1
+  --version 0.3.0
 
 # Requires the helm-diff plugin to be installed:
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.2.1.tgz
+  "${release_name}" guardrails-0.3.0.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -91,7 +91,7 @@ After you've installed the repo you can install the chart.
 helm upgrade --install \
   --create-namespace \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.2.1.tgz
+  "${release_name}" guardrails-0.3.0.tgz
 ```
 
 ## Exposing Guardrails Outside Kubernetes
@@ -161,6 +161,23 @@ utilization.
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity settings for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). If an explicit label selector is not provided for pod affinity or pod anti-affinity one will be created from the pod selector labels. |
 | autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":70}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
+| backend.enabled | bool | `true` |  |
+| backend.env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
+| backend.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the `guardrails` container. |
+| backend.image.repository | string | `"public.ecr.aws/whylabs-dev/pause"` | Image repository for the `guardrails` container. |
+| backend.image.tag | string | `"service"` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
+| backend.livenessProbe | object | `{}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
+| backend.podAnnotations | object | `{}` | Annotations to add to the `Pod`. |
+| backend.podLabels | object | `{}` | Labels to add to the `Pod`. |
+| backend.podSecurityContext | object | `{"runAsNonRoot":true}` | [Pod security context](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core), this supports full customisation. |
+| backend.readinessProbe | object | `{}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |
+| backend.replicaCount | int | `1` |  |
+| backend.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"250Mi","memory":"500Mi"},"requests":{"cpu":"500m","ephemeral-storage":"250Mi","memory":"500Mi"}}` | [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container. |
+| backend.securityContext | object | `{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]},"privileged":false,"readOnlyRootFilesystem":true,"runAsNonRoot":true,"runAsUser":1000}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for the `guardrails` container. |
+| backend.service.annotations | object | `{}` | Service annotations. |
+| backend.service.port | int | `80` | Service HTTP port. |
+| backend.service.targetPort | int | `8080` | The port on which the application container is listening. |
+| backend.service.type | string | `"ClusterIP"` | Service Type, i.e. ClusterIp, LoadBalancer, etc. |
 | commonLabels | object | `{}` | Labels to add to all chart resources. |
 | env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
 | extraVolumeMounts | list | `[]` | Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container. |

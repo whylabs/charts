@@ -46,11 +46,34 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Common labels - Backend
+*/}}
+{{- define "guardrails.backendLabels" -}}
+helm.sh/chart: {{ include "guardrails.chart" . }}
+{{ include "guardrails.backendSelectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- with .Values.commonLabels }}
+{{ toYaml . }}
+{{- end }}
+{{- end }}
+
+{{/*
 Selector labels
 */}}
 {{- define "guardrails.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "guardrails.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Backend Selector labels
+*/}}
+{{- define "guardrails.backendSelectorLabels" -}}
+app.kubernetes.io/name: {{ include "guardrails.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}-backend
 {{- end }}
 
 {{/*
