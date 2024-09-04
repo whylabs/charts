@@ -1,6 +1,6 @@
 # guardrails
 
-![Version: 0.2.1](https://img.shields.io/badge/Version-0.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.23](https://img.shields.io/badge/AppVersion-1.0.23-informational?style=flat-square)
+![Version: 0.2.2](https://img.shields.io/badge/Version-0.2.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.1](https://img.shields.io/badge/AppVersion-2.0.1-informational?style=flat-square)
 
 A Helm chart for WhyLabs Guardrails
 
@@ -75,14 +75,14 @@ release_name=""
 # the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/guardrails \
-  --version 0.2.1
+  --version 0.2.2
 
 # Requires the helm-diff plugin to be installed:
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.2.1.tgz
+  "${release_name}" guardrails-0.2.2.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -91,7 +91,7 @@ After you've installed the repo you can install the chart.
 helm upgrade --install \
   --create-namespace \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.2.1.tgz
+  "${release_name}" guardrails-0.2.2.tgz
 ```
 
 ## Exposing Guardrails Outside Kubernetes
