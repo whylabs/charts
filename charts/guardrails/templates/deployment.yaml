@@ -68,10 +68,8 @@ spec:
           volumeMounts:
             - name: temp-dir
               mountPath: /tmp
-            {{- if .Values.extraVolumeMounts }}
-              {{- with .extraVolumeMounts }}
+            {{- with .Values.extraVolumeMounts }}
               {{- toYaml . | nindent 12 }}
-              {{- end }}
             {{- end }}
       volumes:
         - name: temp-dir
