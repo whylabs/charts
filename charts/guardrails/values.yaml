@@ -30,6 +30,17 @@ commonLabels: {}
 env: {}
   # MY_ENV_VAR: "my env var value"
 
+envFrom: {}
+  # whylabs-guardrails-api-key:
+  #   type: secretRef
+  #   optional: false
+  # whylabs-guardrails-api-secret:
+  #   type: secretRef
+  #   optional: false
+  # custom-config:
+  #   type: configMapRef
+  #   optional: true
+
 serviceAccount:
   # -- If `true`, create a new `ServiceAccount`.
   create: true
