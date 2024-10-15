@@ -30,16 +30,16 @@ commonLabels: {}
 env: {}
   # MY_ENV_VAR: "my env var value"
 
-envFrom: {}
-  # whylabs-guardrails-api-key:
-  #   type: secretRef
-  #   optional: false
-  # whylabs-guardrails-api-secret:
-  #   type: secretRef
-  #   optional: false
-  # custom-config:
-  #   type: configMapRef
-  #   optional: true
+# -- Create environment variables from Kubernetes secrets or config maps.
+envFrom:
+  # -- (map) Comment out or remove this section if using file-based secrets
+  whylabs-guardrails-api-key:
+    type: secretRef
+    optional: true
+  # -- (map) Comment out or remove this section if using file-based secrets
+  whylabs-guardrails-api-secret:
+    type: secretRef
+    optional: true
 
 serviceAccount:
   # -- If `true`, create a new `ServiceAccount`.

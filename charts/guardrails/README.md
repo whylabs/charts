@@ -6,42 +6,77 @@ A Helm chart for WhyLabs Guardrails
 
 ## Prerequisites
 
-### API Key
+### API Key and Secrets Management
 
 Create a [WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-api/#creating-an-api-token)
 that will be used when creating the required Kubernetes secrets to authenticate
 with the WhyLabs API.
 
-### Secrets
+You can manage the API keys and container secrets in one of two ways, depending on your preferred setup:
 
-Use the following `kubectl` commands to create the required Kubernetes
-`Secrets`. These secrets must exist prior to installing the Helm chart.
+1. **Kubernetes Secret-based Management (default)**
 
-```shell
-# API that was created above
-whylabs_api_key=""
-# Arbitrary value that will be required to make requests to the containers
-container_password=""
-# Change this to the desired namespace
-target_namespace="default"
-# Helm release name (See installation for release_name usage)
-release_name=""
+    In this setup, secrets are passed as environment variables by creating Kubernetes Secrets manually. The following commands show how to create secrets for the API key and container authentication:
 
-kubectl create secret generic "whylabs-${release_name}-api-key" \
-  --namespace "${target_namespace}" \
-  --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
+    Use the following `kubectl` commands to create the required Kubernetes
+    `Secrets`. These secrets must exist prior to installing the Helm chart.
 
-kubectl create secret generic "whylabs-${release_name}-api-secret" \
-  --namespace "${target_namespace}" \
-  --from-literal=CONTAINER_PASSWORD="${container_password}"
+    ```shell
+    # API that was created above
+    whylabs_api_key=""
+    # Arbitrary value that will be required to make requests to the containers
+    container_password=""
+    # Change this to the desired namespace
+    target_namespace="default"
+    # Helm release name (See installation for release_name usage)
+    release_name=""
 
-kubectl create secret docker-registry "whylabs-${release_name}-registry-credentials" \
-  --namespace "${target_namespace}" \
-  --docker-server="registry.gitlab.com" \
-  --docker-username="<whylabs-provided-username>" \
-  --docker-password="<whylabs-provided-token>" \
-  --docker-email="<whylabs-provided-email>"
-```
+    kubectl create secret generic "whylabs-${release_name}-api-key" \
+      --namespace "${target_namespace}" \
+      --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
+
+    kubectl create secret generic "whylabs-${release_name}-api-secret" \
+      --namespace "${target_namespace}" \
+      --from-literal=CONTAINER_PASSWORD="${container_password}"
+
+    kubectl create secret docker-registry "whylabs-${release_name}-registry-credentials" \
+      --namespace "${target_namespace}" \
+      --docker-server="registry.gitlab.com" \
+      --docker-username="<whylabs-provided-username>" \
+      --docker-password="<whylabs-provided-token>" \
+      --docker-email="<whylabs-provided-email>"
+    ```
+
+2. **File-based Secrets Management with CSI Drivers**
+
+    If you prefer to use file-based secrets with tools like the AWS Secrets Store CSI Driver, you can configure the Helm chart to load secrets from files mounted into the container. To use file-based secrets, set envFrom: {} in your values.yaml file to disable the environment variable-based configuration.
+
+    Example configuration for file-based secrets:
+
+    - Modify the envFrom section in your `values.yaml`:
+
+        ```yaml
+        envFrom: {}
+        ```
+    - Use your CSI driver to mount secrets as files into the container, which allows
+    the application to read the secrets directly from the filesystem.
+
+### Choose Your Secret Management Strategy
+
+- Environment Variables: This is the default method and requires you to populate secrets as Kubernetes environment variables. Leave the envFrom section in values.yaml unchanged or configure it with your Kubernetes secret references:
+
+    ```yaml
+    envFrom:
+      whylabs-guardrails-api-key:
+        type: secretRef
+        optional: true
+      whylabs-guardrails-api-secret:
+        type: secretRef
+        optional: true
+    ```
+
+- File-based Secrets: If you are using a CSI driver, set envFrom: {} in your
+values.yaml and ensure your secrets are available as mounted files.
 
 ## Installation & Upgrades
 
@@ -163,7 +198,9 @@ utilization.
 | autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":70}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
 | commonLabels | object | `{}` | Labels to add to all chart resources. |
 | env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
-| envFrom | object | `{}` |  |
+| envFrom | object | `{"whylabs-guardrails-api-key":{"optional":true,"type":"secretRef"},"whylabs-guardrails-api-secret":{"optional":true,"type":"secretRef"}}` | Create environment variables from Kubernetes secrets or config maps. |
+| envFrom.whylabs-guardrails-api-key | map | `{"optional":true,"type":"secretRef"}` | Comment out or remove this section if using file-based secrets |
+| envFrom.whylabs-guardrails-api-secret | map | `{"optional":true,"type":"secretRef"}` | Comment out or remove this section if using file-based secrets |
 | extraVolumeMounts | list | `[]` | Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container. |
 | extraVolumes | list | `[]` | Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`. |
 | fullnameOverride | string | `""` | Override the full name of the chart. |
