@@ -50,11 +50,14 @@ spec:
               value: {{ $value | quote }}
             {{- end }}
           {{- end }}
+          {{- if .Values.envFrom }}
           envFrom:
-            - secretRef:
-                name: whylabs-{{ .Release.Name }}-api-key
-            - secretRef:
-                name: whylabs-{{ .Release.Name }}-api-secret
+            {{- range $key, $value := .Values.envFrom }}
+            - {{ $value.type }}:
+                name: {{ $key }}
+                optional: {{ $value.optional | default false }}
+            {{- end }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
