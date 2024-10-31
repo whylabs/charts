@@ -32,14 +32,12 @@ env: {}
 
 # -- Create environment variables from Kubernetes secrets or config maps.
 envFrom:
-  # -- (map) Comment out or remove this section if using file-based secrets
-  whylabs-guardrails-api-key:
-    type: secretRef
-    optional: true
-  # -- (map) Comment out or remove this section if using file-based secrets
-  whylabs-guardrails-api-secret:
-    type: secretRef
-    optional: true
+  - secretRef:
+      name: whylabs-guardrails-api-key
+      optional: true
+  - secretRef:
+      name: whylabs-guardrails-api-secret
+      optional: true
 
 serviceAccount:
   # -- If `true`, create a new `ServiceAccount`.
