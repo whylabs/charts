@@ -52,11 +52,7 @@ spec:
           {{- end }}
           {{- if .Values.envFrom }}
           envFrom:
-            {{- range $key, $value := .Values.envFrom }}
-            - {{ $value.type }}:
-                name: {{ $key }}
-                optional: {{ $value.optional | default false }}
-            {{- end }}
+            {{- toYaml .Values.envFrom | nindent 12 }}
           {{- end }}
           ports:
             - name: http
