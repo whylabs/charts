@@ -11,7 +11,7 @@ services:
       CONTAINER_PASSWORD: null
       # A whylabs api key generated in the WhyLabs platform
       WHYLABS_API_KEY: null
-    image: registry.gitlab.com/whylabs/langkit-container:1.0.22
+    image: registry.gitlab.com/whylabs/langkit-container:2.1.0
     platform: linux/amd64
     ports:
       - target: 8000
