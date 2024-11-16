@@ -1,0 +1,76 @@
+{{- if .Values.cache.enable }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-cache
+  labels:
+    {{- include "guardrails.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.cache.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-cache
+  template:
+    metadata:
+      {{- with .Values.cache.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "guardrails.labels" . | nindent 8 }}
+        app: {{ .Release.Name }}-cache
+    spec:
+      serviceAccountName: {{ include "guardrails.serviceAccountName" . }}
+      containers:
+        - name: nginx
+          securityContext:
+            privileged: false
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 101
+            runAsGroup: 101
+            fsGroup: 101
+            capabilities:
+              drop: ["ALL"]
+          image: "nginxinc/nginx-unprivileged:latest"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/cache_config.conf
+              subPath: cache_config.conf
+            - name: nginx-config
+              mountPath: /etc/nginx/common_proxy.conf
+              subPath: common_proxy.conf
+            - name: nginx-temp
+              mountPath: /tmp
+            - name: nginx-cache
+              mountPath: /var/cache/nginx
+      volumes:
+        - name: nginx-temp
+          emptyDir: {}
+        - name: nginx-cache
+          emptyDir: {}
+        - name: nginx-config
+          configMap:
+            name: {{ include "guardrails.fullname" . }}-cache
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

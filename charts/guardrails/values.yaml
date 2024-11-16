@@ -1,3 +1,9 @@
+cache:
+  enable: false
+  replicaCount: 1
+  annotations: {}
+  labels: {}
+
 # -- Number of replicas for the service.
 replicaCount: 4
 
