@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning]
 
 - Caching support enabled with `cache.enable: true`
 - Horizontal Pod Autoscaler (HPA) support for configuring scaling behavior
+- Startup probe to support more graceful startup and scaling behavior
 
 ## [0.3.1] - 2024-10-31
 

@@ -117,23 +117,30 @@ resources:
     memory: 4Gi
     ephemeral-storage: 250Mi
 
-# -- [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container.
+# -- [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. Liveness and readiness probes are suppressed until the startup probe succeeds.
+startupProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  failureThreshold: 20
+  initialDelaySeconds: 20
+  periodSeconds: 10
+
+# -- [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. Failed livenessProbes restarts containers
 livenessProbe:
   httpGet:
     path: /health
     port: 8000
-  failureThreshold: 3
-  initialDelaySeconds: 30
-  periodSeconds: 30
+  failureThreshold: 5
+  periodSeconds: 10
 
-# -- [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container.
+# -- [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. Failed readinessProbes remove the pod from the service.
 readinessProbe:
   httpGet:
     path: /health
     port: 8000
-  failureThreshold: 10
-  initialDelaySeconds: 30
-  periodSeconds: 30
+  failureThreshold: 2
+  periodSeconds: 10
 
 # -- [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container.
 autoscaling:
