@@ -31,11 +31,11 @@ You can manage the API keys and container secrets in one of two ways, depending 
     # Helm release name (See installation for release_name usage)
     release_name=""
 
-    kubectl create secret generic "whylabs-${release_name}-api-key" \
+    kubectl create secret generic "whylabs-guardrails-api-key" \
       --namespace "${target_namespace}" \
       --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
 
-    kubectl create secret generic "whylabs-${release_name}-api-secret" \
+    kubectl create secret generic "whylabs-guardrails-api-secret" \
       --namespace "${target_namespace}" \
       --from-literal=CONTAINER_PASSWORD="${container_password}"
 
@@ -67,12 +67,12 @@ You can manage the API keys and container secrets in one of two ways, depending 
 
     ```yaml
     envFrom:
-      whylabs-guardrails-api-key:
-        type: secretRef
-        optional: true
-      whylabs-guardrails-api-secret:
-        type: secretRef
-        optional: true
+      - secretRef:
+          name: whylabs-guardrails-api-key
+          optional: true
+      - secretRef:
+          name: whylabs-guardrails-api-secret
+          optional: true
     ```
 
 - File-based Secrets: If you are using a CSI driver, set envFrom: {} in your
@@ -195,9 +195,11 @@ utilization.
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity settings for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). If an explicit label selector is not provided for pod affinity or pod anti-affinity one will be created from the pod selector labels. |
-| autoscaling | object | `{"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":70}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
+| autoscaling | object | `{"behavior":{"scaleDown":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":30}],"selectPolicy":"Max","stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":50}],"selectPolicy":"Min","stabilizationWindowSeconds":180}},"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":70}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
 | cache.annotations | object | `{}` |  |
+| cache.duration | string | `"1m"` |  |
 | cache.enable | bool | `false` |  |
+| cache.endpoint | string | `"api.whylabsapp.com"` |  |
 | cache.labels | object | `{}` |  |
 | cache.replicaCount | int | `1` |  |
 | commonLabels | object | `{}` | Labels to add to all chart resources. |
@@ -208,7 +210,7 @@ utilization.
 | fullnameOverride | string | `""` | Override the full name of the chart. |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the `guardrails` container. |
 | image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` | Image repository for the `guardrails` container. |
-| image.tag | string | `""` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
+| image.tag | string | `"2.2.2"` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
 | imagePullSecrets[0] | list | `{"name":""}` | Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials` if `name: ""`. To exclude The ImagePullSecret entirely, set `imagePullSecrets: []` and comment out the list items. |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}],"tls":[]}` | [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) configuration for the `guardrails` container. |
 | livenessProbe | object | `{"failureThreshold":3,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":30,"periodSeconds":30}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. |

@@ -1,6 +1,8 @@
 cache:
   enable: false
+  duration: 1m
   replicaCount: 1
+  endpoint: "api.whylabsapp.com"
   annotations: {}
   labels: {}
 
@@ -14,7 +16,7 @@ image:
   pullPolicy: IfNotPresent
   # -- (string) Image tag for the `guardrails` container, this will default to
   # `.Chart.AppVersion` if not set.
-  tag: ""
+  tag: "2.2.2"
 
 imagePullSecrets:
   # -- (list) Image pull secrets for the `guardrails` container. Defaults to
@@ -138,6 +140,37 @@ autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 100
+  behavior:
+    scaleUp:
+      policies:
+        - type: Pods
+          value: "{{ .Values.replicaCount | int }}"
+          periodSeconds: 180
+        - type: Percent
+          value: 50
+          periodSeconds: 180
+      # selectPolicy can be `Min` or `Max` and refers to scaling policy
+      # to choose when there are multiple policies; `Max` will choose the
+      # policy perform the largest scaling adjustment, while `Min` will
+      # choose the policy that performs the smallest scaling adjustment.
+      selectPolicy: Min
+      stabilizationWindowSeconds: 180
+    scaleDown:
+      policies:
+        - type: Pods
+          value: "{{ .Values.replicaCount | int }}"
+          # periodSeconds is the rate at which a policy can be applied;
+          # this policy may only be applied once per period.
+          periodSeconds: 180
+        - type: Percent
+          value: 30
+          # periodSeconds is the rate at which a policy can be applied;
+          # this policy may only be applied once per period.
+          periodSeconds: 180
+      selectPolicy: Max
+      # stabilizationWindowSeconds is how many seconds the HPA looks back
+      # to determine if a policy is being met.
+      stabilizationWindowSeconds: 300
   targetCPUUtilizationPercentage: 70
   # targetMemoryUtilizationPercentage: 70
 

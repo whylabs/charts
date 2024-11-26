@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning]
 (https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2024-11-26
+
+### Changed
+
+- Default image tag from `2.0.1` to `2.2.2`
+
+### Added
+
+- Caching support enabled with `cache.enable: true`
+- Horizontal Pod Autoscaler (HPA) support for configuring scaling behavior
+
 ## [0.3.1] - 2024-10-31
 
 ### Fixed

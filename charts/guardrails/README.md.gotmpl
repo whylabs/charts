@@ -38,11 +38,11 @@ You can manage the API keys and container secrets in one of two ways, depending 
     # Helm release name (See installation for release_name usage)
     release_name=""
 
-    kubectl create secret generic "whylabs-${release_name}-api-key" \
+    kubectl create secret generic "whylabs-guardrails-api-key" \
       --namespace "${target_namespace}" \
       --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
 
-    kubectl create secret generic "whylabs-${release_name}-api-secret" \
+    kubectl create secret generic "whylabs-guardrails-api-secret" \
       --namespace "${target_namespace}" \
       --from-literal=CONTAINER_PASSWORD="${container_password}"
 
@@ -74,12 +74,12 @@ You can manage the API keys and container secrets in one of two ways, depending 
 
     ```yaml
     envFrom:
-      whylabs-guardrails-api-key:
-        type: secretRef
-        optional: true
-      whylabs-guardrails-api-secret:
-        type: secretRef
-        optional: true
+      - secretRef:
+          name: whylabs-guardrails-api-key
+          optional: true
+      - secretRef:
+          name: whylabs-guardrails-api-secret
+          optional: true
     ```
 
 - File-based Secrets: If you are using a CSI driver, set envFrom: {} in your
