@@ -60,7 +60,7 @@ spec:
           emptyDir: {}
         - name: nginx-config
           configMap:
-            name: {{ include "guardrails.fullname" . }}-cache
+            name: {{ include "guardrails.fullname" . }}-nginx
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
