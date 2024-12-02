@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-cache
+  name: {{ .Release.Name }}-nginx
 spec:
   type: ClusterIP
   ports:
@@ -11,5 +11,5 @@ spec:
       port: 80
       targetPort: 8080
   selector:
-    app: {{ .Release.Name }}-cache
+    app: {{ .Release.Name }}-nginx
 {{- end }}

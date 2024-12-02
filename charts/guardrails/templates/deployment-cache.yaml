@@ -2,14 +2,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-cache
+  name: {{ .Release.Name }}-nginx
   labels:
     {{- include "guardrails.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.cache.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-cache
+      app: {{ .Release.Name }}-nginx
   template:
     metadata:
       {{- with .Values.cache.annotations }}
@@ -18,7 +18,7 @@ spec:
       {{- end }}
       labels:
         {{- include "guardrails.labels" . | nindent 8 }}
-        app: {{ .Release.Name }}-cache
+        app: {{ .Release.Name }}-nginx
     spec:
       serviceAccountName: {{ include "guardrails.serviceAccountName" . }}
       securityContext:

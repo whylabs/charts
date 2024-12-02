@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Release.Name }}-cache
+  name: {{ .Release.Name }}-nginx
 data:
   nginx.conf: |
     pid /tmp/nginx.pid;
