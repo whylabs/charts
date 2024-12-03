@@ -4,93 +4,101 @@
 
 A Helm chart for WhyLabs Guardrails
 
+- [Prerequisites](#prerequisites)
+- [Configuring WhyLabs credentials](#whylabs-credentials)
+- [Helm Chart Installation & Upgrades](#installation-upgrades)
+- [Exposing Guardrails Outside Kubernetes](#exposing-guardrails-outside-kubernetes)
+- [Horizontal Pod Autoscaling (HPA)](#horizontal-pod-autoscaling-hpa)
+
 ## Prerequisites
 
-### API Key and Secrets Management
+- [Create and configure WhyLabs credentials](#whylabs-credentials)
 
-Create a [WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-api/#creating-an-api-token)
-that will be used when creating the required Kubernetes secrets to authenticate
-with the WhyLabs API.
+## WhyLabs credentials
 
-You can manage the API keys and container secrets in one of two ways, depending on your preferred setup:
+- [WhyLabs API Key](#whylabs-api-key)
+- [WhyLabs Container Password](#whylabs-container-password)
 
-1. **Kubernetes Secret-based Management (default)**
+### WhyLabs API Key
 
-    In this setup, secrets are passed as environment variables by creating Kubernetes Secrets manually. The following commands show how to create secrets for the API key and container authentication:
+1. Create a [WhyLabs API Key](https://docs.whylabs.ai/docs/whylabs-api/#creating-an-api-token)
 
-    Use the following `kubectl` commands to create the required Kubernetes
-    `Secrets`. These secrets must exist prior to installing the Helm chart.
+2. Store the API key in one of the following locations:
 
-    ```shell
-    # API that was created above
-    whylabs_api_key=""
-    # Arbitrary value that will be required to make requests to the containers
-    container_password=""
-    # Change this to the desired namespace
-    target_namespace="default"
-    # Helm release name (See installation for release_name usage)
-    release_name=""
+  - [Kubernetes Secret](#kubernetes-secret-default)
+  - [Mounted Volume](#mounted-volume)
 
-    kubectl create secret generic "whylabs-guardrails-api-key" \
-      --namespace "${target_namespace}" \
-      --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
+#### Kubernetes Secret (Default)
 
-    kubectl create secret generic "whylabs-guardrails-api-secret" \
-      --namespace "${target_namespace}" \
-      --from-literal=CONTAINER_PASSWORD="${container_password}"
+```shell
+# WhyLabs API key
+whylabs_api_key=""
 
-    kubectl create secret docker-registry "whylabs-${release_name}-registry-credentials" \
-      --namespace "${target_namespace}" \
-      --docker-server="registry.gitlab.com" \
-      --docker-username="<whylabs-provided-username>" \
-      --docker-password="<whylabs-provided-token>" \
-      --docker-email="<whylabs-provided-email>"
-    ```
+# Change this to the desired namespace
+target_namespace="default"
 
-2. **File-based Secrets Management with CSI Drivers**
+# The `WHYLABS_API_KEY` key is used as the env variable name within the `Pod`
+kubectl create secret generic "whylabs-guardrails-api-key" \
+  --namespace "${target_namespace}" \
+  --from-literal=WHYLABS_API_KEY="${whylabs_api_key}"
+```
 
-    If you prefer to use file-based secrets with tools like the AWS Secrets Store CSI Driver, you can configure the Helm chart to load secrets from files mounted into the container. To use file-based secrets, set envFrom: {} in your values.yaml file to disable the environment variable-based configuration.
+#### Mounted Volume
 
-    Example configuration for file-based secrets:
+Alternatively, any file mounted to `/var/run/secrets/whylabs.ai/env` will be automatically picked up by the container and used as an environment variable. The environment variable name will be the filename, and the file contents will be the value, e.g.:
 
-    - Modify the envFrom section in your `values.yaml`:
+```shell
+$ tree /var/run/secrets/whylabs.ai/env
 
-        ```yaml
-        envFrom: {}
-        ```
-    - Use your CSI driver to mount secrets as files into the container, which allows
-    the application to read the secrets directly from the filesystem.
+/var/run/secrets/whylabs.ai/env
+├── whylabs_api_key
+├── container_password
+└── any_other_env_vars
 
-### Choose Your Secret Management Strategy
+$ cat /var/run/secrets/whylabs.ai/env/whylabs_api_key
 
-- Environment Variables: This is the default method and requires you to populate secrets as Kubernetes environment variables. Leave the envFrom section in values.yaml unchanged or configure it with your Kubernetes secret references:
+MyS3cr3tWhyL@b5@piK3y
+```
 
-    ```yaml
-    envFrom:
-      - secretRef:
-          name: whylabs-guardrails-api-key
-          optional: true
-      - secretRef:
-          name: whylabs-guardrails-api-secret
-          optional: true
-    ```
+Declare and mount the volumes by overriding `extraVolumes` and `extraVolumeMounts` in the `values.yaml` file. The following example assumes the use of the [AWS Secrets Store CSI Driver](https://github.com/aws/secrets-store-csi-driver-provider-aws), but the concept is the same for any other method of mounting files into the container.
 
-- File-based Secrets: If you are using a CSI driver, set envFrom: {} in your
-values.yaml and ensure your secrets are available as mounted files.
+```yaml
+extraVolumeMounts:
+  - name: whylabs-secret-provider
+    mountPath: /var/run/secrets/whylabs.ai/env
+    readOnly: true
+
+extraVolumes:
+  - name: whylabs-secret-provider
+    csi:
+      driver: secrets-store.csi.k8s.io
+      readOnly: true
+      volumeAttributes:
+        secretProviderClass: "your-whylabs-secret-provider-name"
+```
+
+### WhyLabs Container Password
+
+The container password is an arbitrary value that must be included with every guardrails container request (required by default). To disable the container password, set the `DISABLE_CONTAINER_PASSWORD` environment variable to `True`.
+
+To store the container password in a Kubernetes Secret, run the following command:
+
+```shell
+# Arbitrary value that will be required to make requests to the containers
+container_password=""
+
+# Change this to the desired namespace
+target_namespace="default"
+
+# The `CONTAINER_PASSWORD` key is used as the env variable name within the `Pod`
+kubectl create secret generic "whylabs-guardrails-api-secret" \
+  --namespace "${target_namespace}" \
+  --from-literal=CONTAINER_PASSWORD="${container_password}"
+```
+
+Alternatively, the container password can be provided as a [mounted volume](#mounted-volume) as described in the [WhyLabs API Key](#whylabs-api-key) section.
 
 ## Installation & Upgrades
-
-> :warning: To expose guardrails to callers outside of your K8s cluster you will
-need an Ingress Controller such as
-[NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/), a
-Gateway Controller such as [Ambassador](https://www.getambassador.io/), a
-Service Mesh such as [Istio](https://istio.io/), or a Load Balancer Controller
-such as [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller).
-The installation and configuration of the aforementioned controllers are outside
-the scope of this document. However, for a quickstart guide to expose Guardrails
-to the public internet via AWS LBC, see the
-[Exposing Guardrails Outside Kubernetes](#exposing-guardrails-outside-kubernetes)
-section.
 
 ### How to Use WhyLabs Helm Repository
 
@@ -131,6 +139,16 @@ helm upgrade --install \
 
 ## Exposing Guardrails Outside Kubernetes
 
+> :warning: To expose guardrails to callers outside of your K8s cluster you will
+need an Ingress Controller such as
+[NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/), a
+Gateway Controller such as [Ambassador](https://www.getambassador.io/), a
+Service Mesh such as [Istio](https://istio.io/), or a Load Balancer Controller
+such as [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller).
+The installation and configuration of the aforementioned controllers are outside
+the scope of this document. However, for a quickstart guide to expose Guardrails
+to the public internet via AWS LBC, see the following section.
+
 This section serves as a quickstart guide to install AWS LBC and configure the
 Helm chart to expose Guardrails outside of your Kubernetes cluster via an
 internal NLB.
@@ -164,9 +182,7 @@ service:
 
 The Horizontal Pod Autoscaler automatically scales the number of pods in a
 replication controller, deployment, replica set or stateful set based on
-observed CPU utilization (or, with custom metrics support, on some other
-application-provided metrics). The Horizontal Pod Autoscaler uses the following
-formula to calculate the desired number of pods:
+observed CPU utilization (among other metrics that are not in scope for this document). The Horizontal Pod Autoscaler uses the following default formula to calculate the desired number of pods:
 
 ```text
 Desired Replicas = [ (Current Utilization / Target Utilization) * Current Replicas ]
@@ -185,25 +201,88 @@ Desired Replicas = ⌈ (90% / 50%) * 3 ⌉
 
 HPA uses the same formula for both increasing and decreasing the number of pods.
 Horizontal pod scaling is disabled by default. To enable it, set the
-`hpa.enabled` key to `true`. The pods QoS class will impact HPA behavior as a
-deployment that is allowed to burst CPU usage will cause more aggressive HPA
-scaling than a deployment with a `Guaranteed` QoS that does not go above 100%
-utilization.
+`autoscaling.enabled` to `true`.
+
+### Scaling Behavior configuration
+
+When using Horizontal Pod Autoscalers (HPAs) with default configurations users may encounter the following issues:
+
+- Frequent and rapid scaling operations
+- Resource contention caused by aggressive scaling
+- Startup time delays and queue buildup
+- General behavior that appears as though the HPA is not working
+
+The following Horizontal Pod Autoscaler configuration is intended to provide a
+reasonable starting point. :warning: Each deployment will have unique
+characteristics that will require tuning scaling behavior based on factors
+such as node size and type; starting replica count; request load; traffic
+patterns, etc. The following concepts, referencing the example configuration
+below, provide a framework for understanding how the HPA behavior configuration
+works and how to tune it for optimal scaling.
+
+- The `scaleUp` and `scaleDown` policies limit the number of pods added or removed in a single evaluation period.
+- The `stabilizationWindowSeconds` parameter ensures scaling decisions are based on an averaged utilization over 300 seconds, smoothing out temporary spikes or dips in resource usage.
+- The 180-second `periodSeconds` ensures scaling operations are spaced out, allowing the system to stabilize before further scale operations occur.
+
+```yaml
+autoscaling:
+  # Enable or disable HPA (Horizontal Pod Autoscaler).
+  enabled: false
+
+  # The lower limit for the number of replicas to scale down
+  minReplicas: 1
+
+  # The upper limit for the number of replicas to scale up
+  maxReplicas: 100
+
+  # The specifications to use for calculating the desired replica count
+  targetCPUUtilizationPercentage: 70
+
+  # The behavior configuration for scaling up/down.
+  behavior:
+
+    # This configuration provides two policies: a policy that scales the number
+    # of replicas by a fixed amount (4 pods), and a policy that scales the
+    # number of replicas by a percentage (50%). Setting `selectPolicy` to `Min`
+    # will select the scaling policy that creates the fewest number of replicas.
+    # The `stabilizationWindowSeconds` parameter smooths out temporary
+    # fluctuations in CPU utilization by evaluating recommendations over a
+    # 300-second window.
+    scaleUp:
+      policies:
+        - type: Pods
+          value: 4
+          periodSeconds: 180
+        - type: Percent
+          value: 50
+          periodSeconds: 180
+      selectPolicy: Min
+      stabilizationWindowSeconds: 300
+
+    scaleDown:
+      policies:
+        - type: Pods
+          value: 4
+          periodSeconds: 180
+        - type: Percent
+          value: 30
+          periodSeconds: 180
+      selectPolicy: Max
+      stabilizationWindowSeconds: 300
+```
 
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| affinity | object | `{}` | Affinity settings for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). If an explicit label selector is not provided for pod affinity or pod anti-affinity one will be created from the pod selector labels. |
-| autoscaling | object | `{"behavior":{"scaleDown":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":30}],"selectPolicy":"Max","stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":50}],"selectPolicy":"Min","stabilizationWindowSeconds":180}},"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":70}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
-| autoscaling.behavior | object | `{"scaleDown":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":30}],"selectPolicy":"Max","stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":50}],"selectPolicy":"Min","stabilizationWindowSeconds":180}}` | Configures the scaling behavior of the target in both Up and Downdirections |
-| autoscaling.behavior.scaleDown.policies | list | `[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":30}]` | Policies a list of potential scaling polices which can be used during scaling. At least one policy must be specified. |
-| autoscaling.behavior.scaleDown.selectPolicy | string | `"Max"` | selectPolicy can be `Min` or `Max` and refers to scaling policy to choose when there are multiple policies; `Max` will choose the policy perform the largest scaling adjustment, while `Min` will choose the policy that performs the smallest scaling adjustment. |
-| autoscaling.behavior.scaleDown.stabilizationWindowSeconds | int | `300` | StabilizationWindowSeconds is how many seconds the HPA looks back to determine if a policy is being met. |
-| autoscaling.behavior.scaleUp.policies | list | `[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":50}]` | Policies a list of potential scaling polices which can be used during scaling. At least one policy must be specified. |
-| autoscaling.behavior.scaleUp.selectPolicy | string | `"Min"` | selectPolicy can be `Min` or `Max` and refers to scaling policy to choose when there are multiple policies; `Max` will choose the policy perform the largest scaling adjustment, while `Min` will choose the policy that performs the smallest scaling adjustment. |
-| autoscaling.behavior.scaleUp.stabilizationWindowSeconds | int | `180` | StabilizationWindowSeconds is how many seconds the HPA looks back to determine if a policy is being met. |
+| affinity | object | `{}` | [Affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) settings for `Pod`. |
+| autoscaling.behavior.scaleUp.policies | list | `[]` | A list of potential [scaling polices](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#scaling-policies) which can be used during scaling |
+| autoscaling.behavior.scaleUp.selectPolicy | string | `"Min"` | Selects which scaling policy to use; selects the policy that performs the `Max` or `Min` scaling. Also applies to `scaleDown` behavior. |
+| autoscaling.behavior.scaleUp.stabilizationWindowSeconds | int | `300` | How many seconds the HPA looks back to determine if a policy is being met; uses the highest recommendation within the stabilization window. Also applies to `scaleDown` behavior. |
 | autoscaling.enabled | bool | `false` | Enable or disable HPA (Horizontal Pod Autoscaler). |
+| autoscaling.maxReplicas | int | `100` | The upper limit for the number of replicas to which the autoscaler can scale up |
+| autoscaling.minReplicas | int | 1 | The lower limit for the number of replicas to which the autoscaler can scale down |
+| autoscaling.targetCPUUtilizationPercentage | int | 80 | The specifications for which to use to calculate the desired replica count |
 | cache.annotations | object | `{}` | Annotations for the cache. |
 | cache.duration | string | `"1m"` | Duration for cache validity. |
 | cache.enable | bool | `true` | Enable or disable caching. |
@@ -211,15 +290,17 @@ utilization.
 | cache.labels | object | `{}` | Labels for the cache. |
 | cache.replicaCount | int | `1` | Number of replicas for the cache. |
 | commonLabels | object | `{}` | Labels to add to all chart resources. |
-| env | object | `{"TENANCY_MODE":"{{ .Values.tenancyMode | default \"SINGLE\" }}"}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
+| env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. **Supports Helm templating syntax**, e.g. you can use `{{ .Release.Name }}` or other templating variables, functions, and conditions within the the value of each environment variable. |
 | envFrom | list | `[{"secretRef":{"name":"whylabs-guardrails-api-key","optional":true}},{"secretRef":{"name":"whylabs-guardrails-api-secret","optional":true}}]` | Create environment variables from Kubernetes secrets or config maps. |
+| envFrom[0].secretRef.name | string | `"whylabs-guardrails-api-key"` | Name of the Kubernetes secret containing the API key. The secret must be in the same namespace as the release and should be created prior to installing the chart. |
+| envFrom[1].secretRef.name | string | `"whylabs-guardrails-api-secret"` | Name of the Kubernetes secret containing the container password, the value used when executing requests against the guardrails container. The secret must be in the same namespace as the release and should be created prior to installing the chart. |
 | extraVolumeMounts | list | `[]` | Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container. |
 | extraVolumes | list | `[]` | Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`. |
 | fullnameOverride | string | `""` | Override the full name of the chart. |
 | image.pullPolicy | string | `"IfNotPresent"` | Image pull policy for the `guardrails` container. |
 | image.repository | string | `"registry.gitlab.com/whylabs/langkit-container"` | Image repository for the `guardrails` container. |
 | image.tag | string | `"2.2.2"` | Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set. |
-| imagePullSecrets[0] | list | `{"name":""}` | Image pull secrets for the `guardrails` container. Defaults to `whylabs-{{ .Release.Name }}-registry-credentials` if `name: ""`. To exclude The ImagePullSecret entirely, set `imagePullSecrets: []` and comment out the list items. |
+| imagePullSecrets | list | `[]` |  |
 | ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"chart-example.local","paths":[{"path":"/","pathType":"ImplementationSpecific"}]}],"tls":[]}` | [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) configuration for the `guardrails` container. |
 | livenessProbe | object | `{"failureThreshold":5,"httpGet":{"path":"/health","port":8000},"periodSeconds":10}` | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. Failed livenessProbes restarts containers |
 | nameOverride | string | `""` | Override the name of the chart. |
