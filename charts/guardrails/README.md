@@ -6,7 +6,7 @@ A Helm chart for WhyLabs Guardrails
 
 - [Prerequisites](#prerequisites)
 - [Configuring WhyLabs credentials](#whylabs-credentials)
-- [Helm Chart Installation & Upgrades](#installation-upgrades)
+- [Helm Chart Installation & Upgrades](#installation--upgrades)
 - [Exposing Guardrails Outside Kubernetes](#exposing-guardrails-outside-kubernetes)
 - [Horizontal Pod Autoscaling (HPA)](#horizontal-pod-autoscaling-hpa)
 
@@ -307,7 +307,7 @@ autoscaling:
 | nodeSelector | object | `{}` | Node labels to match for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). |
 | podAnnotations | object | `{}` | Annotations to add to the `Pod`. |
 | podLabels | object | `{}` | Labels to add to the `Pod`. |
-| podSecurityContext | object | `{"runAsNonRoot":true}` | [Pod security context](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core), this supports full customisation. |
+| podSecurityContext | object | `{"runAsNonRoot":true}` | [Pod security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod), this supports full customisation. |
 | readinessProbe | object | `{"failureThreshold":2,"httpGet":{"path":"/health","port":8000},"periodSeconds":10}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. Failed readinessProbes remove the pod from the service. |
 | replicaCount | int | `4` | Number of replicas for the service. |
 | resources | object | `{"limits":{"cpu":"4","ephemeral-storage":"250Mi","memory":"4Gi"},"requests":{"cpu":"4","ephemeral-storage":"250Mi","memory":"4Gi"}}` | [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container. |

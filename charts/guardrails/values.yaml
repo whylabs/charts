@@ -149,7 +149,7 @@ podAnnotations: {}
 podLabels: {}
 
 # -- [Pod security
-# context](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core), this
+# context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod), this
 # supports full customisation.
 podSecurityContext:
   runAsNonRoot: true
