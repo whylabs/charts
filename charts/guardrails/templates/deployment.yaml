@@ -24,6 +24,8 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         app: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ include "guardrails.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       {{- if gt (len .Values.imagePullSecrets) 0 }}
       imagePullSecrets:
@@ -48,7 +50,7 @@ spec:
           env:
             {{- range $key, $value := .Values.env }}
             - name: {{ $key }}
-              value: {{ $value | quote }}
+              value: {{ tpl $value $ }}
             {{- end }}
           {{- end }}
           {{- if .Values.envFrom }}

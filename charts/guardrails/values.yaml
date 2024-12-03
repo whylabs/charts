@@ -1,10 +1,20 @@
 cache:
-  enable: false
+  # -- Enable or disable caching.
+  enable: true
+  # -- Duration for cache validity.
   duration: 1m
+  # -- Number of replicas for the cache.
   replicaCount: 1
+  # -- Endpoint for the cache service.
   endpoint: "api.whylabsapp.com"
+  # -- Annotations for the cache.
   annotations: {}
+  # -- Labels for the cache.
   labels: {}
+
+# -- (string) tenancyMode for the guardrails service.
+# Must be `SINGLE` or `MULTI`.
+tenancyMode: MULTI
 
 # -- Number of replicas for the service.
 replicaCount: 4
@@ -35,8 +45,10 @@ fullnameOverride: ""
 commonLabels: {}
 
 # -- [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container.
-env: {}
-  # MY_ENV_VAR: "my env var value"
+env:
+  # Uncomment WHYLABS_API_CACHE_ENDPOINT if .Values.cache.enable is true
+  # WHYLABS_API_CACHE_ENDPOINT: "{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local"
+  TENANCY_MODE: "{{ .Values.tenancyMode | default \"SINGLE\" }}"
 
 # -- Create environment variables from Kubernetes secrets or config maps.
 envFrom:
@@ -144,11 +156,14 @@ readinessProbe:
 
 # -- [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container.
 autoscaling:
+  # -- Enable or disable HPA (Horizontal Pod Autoscaler).
   enabled: false
   minReplicas: 1
   maxReplicas: 100
+  # -- Configures the scaling behavior of the target in both Up and Downdirections
   behavior:
     scaleUp:
+      # -- Policies a list of potential scaling polices which can be used during scaling. At least one policy must be specified.
       policies:
         - type: Pods
           value: "{{ .Values.replicaCount | int }}"
@@ -156,13 +171,16 @@ autoscaling:
         - type: Percent
           value: 50
           periodSeconds: 180
-      # selectPolicy can be `Min` or `Max` and refers to scaling policy
+      # -- selectPolicy can be `Min` or `Max` and refers to scaling policy
       # to choose when there are multiple policies; `Max` will choose the
       # policy perform the largest scaling adjustment, while `Min` will
       # choose the policy that performs the smallest scaling adjustment.
       selectPolicy: Min
+      # -- StabilizationWindowSeconds is how many seconds the HPA looks back
+      # to determine if a policy is being met.
       stabilizationWindowSeconds: 180
     scaleDown:
+      # -- Policies a list of potential scaling polices which can be used during scaling. At least one policy must be specified.
       policies:
         - type: Pods
           value: "{{ .Values.replicaCount | int }}"
@@ -174,8 +192,12 @@ autoscaling:
           # periodSeconds is the rate at which a policy can be applied;
           # this policy may only be applied once per period.
           periodSeconds: 180
+      # -- selectPolicy can be `Min` or `Max` and refers to scaling policy
+      # to choose when there are multiple policies; `Max` will choose the
+      # policy perform the largest scaling adjustment, while `Min` will
+      # choose the policy that performs the smallest scaling adjustment.
       selectPolicy: Max
-      # stabilizationWindowSeconds is how many seconds the HPA looks back
+      # -- StabilizationWindowSeconds is how many seconds the HPA looks back
       # to determine if a policy is being met.
       stabilizationWindowSeconds: 300
   targetCPUUtilizationPercentage: 70

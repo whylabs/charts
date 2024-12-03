@@ -19,6 +19,8 @@ spec:
       labels:
         {{- include "guardrails.labels" . | nindent 8 }}
         app: {{ .Release.Name }}-nginx
+        app.kubernetes.io/name: {{ include "guardrails.name" . }}-nginx
+        app.kubernetes.io/instance: {{ .Release.Name }}-nginx
     spec:
       serviceAccountName: {{ include "guardrails.serviceAccountName" . }}
       securityContext:

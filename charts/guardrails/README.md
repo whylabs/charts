@@ -1,6 +1,6 @@
 # guardrails
 
-![Version: 0.4.6](https://img.shields.io/badge/Version-0.4.6-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.2](https://img.shields.io/badge/AppVersion-2.2.2-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.2](https://img.shields.io/badge/AppVersion-2.2.2-informational?style=flat-square)
 
 A Helm chart for WhyLabs Guardrails
 
@@ -110,14 +110,14 @@ release_name=""
 # the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/guardrails \
-  --version 0.4.6
+  --version 0.5.0
 
 # Requires the helm-diff plugin to be installed:
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.4.6.tgz
+  "${release_name}" guardrails-0.5.0.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -126,7 +126,7 @@ After you've installed the repo you can install the chart.
 helm upgrade --install \
   --create-namespace \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.4.6.tgz
+  "${release_name}" guardrails-0.5.0.tgz
 ```
 
 ## Exposing Guardrails Outside Kubernetes
@@ -196,14 +196,22 @@ utilization.
 |-----|------|---------|-------------|
 | affinity | object | `{}` | Affinity settings for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). If an explicit label selector is not provided for pod affinity or pod anti-affinity one will be created from the pod selector labels. |
 | autoscaling | object | `{"behavior":{"scaleDown":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":30}],"selectPolicy":"Max","stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":50}],"selectPolicy":"Min","stabilizationWindowSeconds":180}},"enabled":false,"maxReplicas":100,"minReplicas":1,"targetCPUUtilizationPercentage":70}` | [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container. |
-| cache.annotations | object | `{}` |  |
-| cache.duration | string | `"1m"` |  |
-| cache.enable | bool | `false` |  |
-| cache.endpoint | string | `"api.whylabsapp.com"` |  |
-| cache.labels | object | `{}` |  |
-| cache.replicaCount | int | `1` |  |
+| autoscaling.behavior | object | `{"scaleDown":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":30}],"selectPolicy":"Max","stabilizationWindowSeconds":300},"scaleUp":{"policies":[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":50}],"selectPolicy":"Min","stabilizationWindowSeconds":180}}` | Configures the scaling behavior of the target in both Up and Downdirections |
+| autoscaling.behavior.scaleDown.policies | list | `[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":30}]` | Policies a list of potential scaling polices which can be used during scaling. At least one policy must be specified. |
+| autoscaling.behavior.scaleDown.selectPolicy | string | `"Max"` | selectPolicy can be `Min` or `Max` and refers to scaling policy to choose when there are multiple policies; `Max` will choose the policy perform the largest scaling adjustment, while `Min` will choose the policy that performs the smallest scaling adjustment. |
+| autoscaling.behavior.scaleDown.stabilizationWindowSeconds | int | `300` | StabilizationWindowSeconds is how many seconds the HPA looks back to determine if a policy is being met. |
+| autoscaling.behavior.scaleUp.policies | list | `[{"periodSeconds":180,"type":"Pods","value":"{{ .Values.replicaCount | int }}"},{"periodSeconds":180,"type":"Percent","value":50}]` | Policies a list of potential scaling polices which can be used during scaling. At least one policy must be specified. |
+| autoscaling.behavior.scaleUp.selectPolicy | string | `"Min"` | selectPolicy can be `Min` or `Max` and refers to scaling policy to choose when there are multiple policies; `Max` will choose the policy perform the largest scaling adjustment, while `Min` will choose the policy that performs the smallest scaling adjustment. |
+| autoscaling.behavior.scaleUp.stabilizationWindowSeconds | int | `180` | StabilizationWindowSeconds is how many seconds the HPA looks back to determine if a policy is being met. |
+| autoscaling.enabled | bool | `false` | Enable or disable HPA (Horizontal Pod Autoscaler). |
+| cache.annotations | object | `{}` | Annotations for the cache. |
+| cache.duration | string | `"1m"` | Duration for cache validity. |
+| cache.enable | bool | `true` | Enable or disable caching. |
+| cache.endpoint | string | `"api.whylabsapp.com"` | Endpoint for the cache service. |
+| cache.labels | object | `{}` | Labels for the cache. |
+| cache.replicaCount | int | `1` | Number of replicas for the cache. |
 | commonLabels | object | `{}` | Labels to add to all chart resources. |
-| env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
+| env | object | `{"TENANCY_MODE":"{{ .Values.tenancyMode | default \"SINGLE\" }}"}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. |
 | envFrom | list | `[{"secretRef":{"name":"whylabs-guardrails-api-key","optional":true}},{"secretRef":{"name":"whylabs-guardrails-api-secret","optional":true}}]` | Create environment variables from Kubernetes secrets or config maps. |
 | extraVolumeMounts | list | `[]` | Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container. |
 | extraVolumes | list | `[]` | Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`. |
@@ -233,6 +241,7 @@ utilization.
 | serviceAccount.labels | object | `{}` | Labels to add to the service account. |
 | serviceAccount.name | string | `""` | If this is set and `serviceAccount.create` is `true` this will be used for the created `ServiceAccount` name, if set and `serviceAccount.create` is `false` then this will define an existing `ServiceAccount` to use. |
 | startupProbe | object | `{"failureThreshold":20,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":20,"periodSeconds":10}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. Liveness and readiness probes are suppressed until the startup probe succeeds. |
+| tenancyMode | string | `"MULTI"` | tenancyMode for the guardrails service. Must be `SINGLE` or `MULTI`. |
 | tolerations | list | `[]` | Node taints which will be tolerated for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). |
 
 ----------------------------------------------
