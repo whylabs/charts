@@ -35,7 +35,6 @@ Common labels
 */}}
 {{- define "guardrails.labels" -}}
 helm.sh/chart: {{ include "guardrails.chart" . }}
-{{ include "guardrails.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}

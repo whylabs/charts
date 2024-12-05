@@ -10,8 +10,45 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: {{ include "guardrails.fullname" . }}
-  minReplicas: {{ .Values.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  minReplicas: {{ default 1 .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ default 20 .Values.autoscaling.maxReplicas }}
+  {{- with .Values.autoscaling.behavior }}
+  behavior:
+    {{- with .scaleUp }}
+    scaleUp:
+      {{- with .policies }}
+      policies:
+        {{- range . }}
+        - type: {{ .type }}
+          value: {{ tpl (toString .value) $ | int }}
+          periodSeconds: {{ .periodSeconds | int }}
+        {{- end }}
+      {{- end }}
+      {{- with .selectPolicy }}
+      selectPolicy: {{ . }}
+      {{- end }}
+      {{- with .stabilizationWindowSeconds }}
+      stabilizationWindowSeconds: {{ . | int }}
+      {{- end }}
+    {{- end }}
+    {{- with .scaleDown }}
+    scaleDown:
+      {{- with .policies }}
+      policies:
+        {{- range . }}
+        - type: {{ .type }}
+          value: {{ tpl (toString .value) $ | int }}
+          periodSeconds: {{ .periodSeconds | int }}
+        {{- end }}
+      {{- end }}
+      {{- with .selectPolicy }}
+      selectPolicy: {{ . }}
+      {{- end }}
+      {{- with .stabilizationWindowSeconds }}
+      stabilizationWindowSeconds: {{ . | int}}
+      {{- end }}
+    {{- end }}
+  {{- end }}
   metrics:
     {{- if .Values.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource

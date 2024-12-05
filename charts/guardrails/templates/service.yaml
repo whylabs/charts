@@ -16,4 +16,4 @@ spec:
       port: {{ .Values.service.port }}
       targetPort: {{ .Values.service.targetPort }}
   selector:
-    {{- include "guardrails.selectorLabels" . | nindent 4 }}
+    app: {{ .Release.Name }}

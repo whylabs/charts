@@ -1,104 +1,174 @@
-# -- Number of replicas for the service.
-replicaCount: 4
+# -- [Affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) settings for `Pod`.
+affinity: {}
 
-image:
-  # -- Image repository for the `guardrails` container.
-  repository: registry.gitlab.com/whylabs/langkit-container
-  # -- Image pull policy for the `guardrails` container.
-  pullPolicy: IfNotPresent
-  # -- (string) Image tag for the `guardrails` container, this will default to
-  # `.Chart.AppVersion` if not set.
-  tag: ""
+autoscaling:
+  # -- Enable or disable HPA (Horizontal Pod Autoscaler).
+  enabled: false
+  # -- The lower limit for the number of replicas to which the autoscaler can scale down
+  # @default -- 1
+  minReplicas: 1
+  # -- The upper limit for the number of replicas to which the autoscaler can scale up
+  maxReplicas: 100
+  # -- The specifications for which to use to calculate the desired replica count
+  # @default -- 80
+  targetCPUUtilizationPercentage: 70
+  # targetMemoryUtilizationPercentage: 70
+  behavior:
+    # Scaling policies for increasing the number of replicas, can be `scaleUp` or `scaleDown`.
+    scaleUp:
+      # -- A list of potential [scaling polices](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#scaling-policies)
+      # which can be used during scaling
+      policies:
+        # @ignored
+        # Specifies the scaling policy of either `Pods` or `Percent`
+        - type: Pods
+          # The amount of change permitted by the policy
+          value: 4
+          # specifies the window of time for which the policy should hold true.
+          periodSeconds: 180
+        # @ignored
+        - type: Percent
+          value: 50
+          periodSeconds: 180
+      # -- Selects which scaling policy to use; selects the policy that performs the `Max` or `Min` scaling.
+      # Also applies to `scaleDown` behavior.
+      selectPolicy: Min
+      # -- How many seconds the HPA looks back to determine if a policy is being met; uses the highest
+      # recommendation within the stabilization window. Also applies to `scaleDown` behavior.
+      stabilizationWindowSeconds: 300
+    # scaleDown:
+    #   policies:
+    #     - type: Pods
+    #       value: 4
+    #       periodSeconds: 180
+    #     - type: Percent
+    #       value: 30
+    #       periodSeconds: 180
+    #   selectPolicy: Max
+    #   stabilizationWindowSeconds: 300
 
-imagePullSecrets:
-  # -- (list) Image pull secrets for the `guardrails` container. Defaults to
-  # `whylabs-{{ .Release.Name }}-registry-credentials` if `name: ""`. To exclude
-  # The ImagePullSecret entirely, set `imagePullSecrets: []` and comment out the
-  # list items.
-  - name: ""
-
-# -- (string) Override the name of the chart.
-nameOverride: ""
-
-# -- (string) Override the full name of the chart.
-fullnameOverride: ""
+cache:
+  # -- Enable or disable caching.
+  enable: true
+  # -- Duration for cache validity.
+  duration: 1m
+  # -- Number of replicas for the cache.
+  replicaCount: 1
+  # -- Endpoint for the cache service.
+  endpoint: "api.whylabsapp.com"
+  # -- Annotations for the cache.
+  annotations: {}
+  # -- Labels for the cache.
+  labels: {}
 
 # -- Labels to add to all chart resources.
 commonLabels: {}
 
-# -- [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container.
-env: {}
-  # MY_ENV_VAR: "my env var value"
+# -- [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/)
+# for the `guardrails` container. **Supports Helm templating syntax**, e.g. you can use `{{ .Release.Name }}` or other
+# templating variables, functions, and conditions within the the value of each environment variable.
+env:
+  # Uncomment WHYLABS_API_CACHE_ENDPOINT if .Values.cache.enable is true 
+  # WHYLABS_API_CACHE_ENDPOINT: "{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local"
+  # @ignored
+  TENANCY_MODE: "{{ .Values.tenancyMode | default \"SINGLE\" }}"
 
 # -- Create environment variables from Kubernetes secrets or config maps.
 envFrom:
   - secretRef:
+      # -- Name of the Kubernetes secret containing the API key. The secret must be in the same namespace as the
+      # release and should be created prior to installing the chart.
       name: whylabs-guardrails-api-key
       optional: true
   - secretRef:
+      # -- Name of the Kubernetes secret containing the container password, the value used when executing requests
+      # against the guardrails container. The secret must be in the same namespace as the release and should be
+      # created prior to installing the chart.
       name: whylabs-guardrails-api-secret
       optional: true
 
-serviceAccount:
-  # -- If `true`, create a new `ServiceAccount`.
-  create: true
-  # -- (string) If this is set and `serviceAccount.create` is `true` this will be used for the created `ServiceAccount` name, if set and `serviceAccount.create` is `false` then this will define an existing `ServiceAccount` to use.
-  name: ""
-  # -- Labels to add to the service account.
-  labels: {}
-  # -- Annotations to add to the service account.
-  annotations: {}
-  # -- Set this to `false` to [opt out of API credential automounting](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#opt-out-of-api-credential-automounting) for the `ServiceAccount`.
-  automount: true
+# -- Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container.
+extraVolumeMounts: []
 
-service:
-  # -- Service annotations.
-  annotations: {}
-  # -- Service Type, i.e. ClusterIp, LoadBalancer, etc.
-  type: ClusterIP
-  # -- Service HTTP port.
-  port: 80
-  # -- The port on which the application container is listening.
-  targetPort: 8000
-  
-# -- Annotations to add to the `Pod`.
-podAnnotations: {}
+# -- Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`.
+extraVolumes: []
 
-# -- Labels to add to the `Pod`.
-podLabels: {}
+# -- (string) Override the full name of the chart.
+fullnameOverride: ""
 
-# -- [Pod security context](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core), this supports full customisation.
-podSecurityContext:
-  runAsNonRoot: true
+image:
+  # -- Image pull policy for the `guardrails` container.
+  pullPolicy: IfNotPresent
+  # -- Image repository for the `guardrails` container.
+  repository: registry.gitlab.com/whylabs/langkit-container
+  # -- (string) Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set.
+  tag: "2.2.2"
 
-# -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for the `guardrails` container.
-securityContext:
-  privileged: false
-  allowPrivilegeEscalation: false
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
-  capabilities:
-    drop: ["ALL"]
+imagePullSecrets: []
+  # -- Image pull secrets for the `guardrails` container. If `name` is set to `""`, then the default value of
+  # `whylabs-{{ .Release.Name }}-registry-credentials` is used.
+  # - name: ""
 
-# -- [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) configuration for the `guardrails` container.
+# -- [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/) configuration for the
+# `guardrails` container.
 ingress:
   enabled: false
   className: ""
   annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+    # kubernetes.io/ingress.class: nginx kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
+  #  - secretName: chart-example-tls hosts:
   #      - chart-example.local
 
-# -- [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails` container.
+# -- [Liveness
+# probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+# configuration for the `guardrails` container. Failed livenessProbes restarts containers
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  failureThreshold: 5
+  periodSeconds: 10
+
+# -- (string) Override the name of the chart.
+nameOverride: ""
+
+# -- Node labels to match for `Pod`
+# [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+nodeSelector: {}
+
+# -- Annotations to add to the `Pod`.
+podAnnotations: {}
+
+# -- Labels to add to the `Pod`.
+podLabels: {}
+
+# -- [Pod security
+# context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod), this
+# supports full customisation.
+podSecurityContext:
+  runAsNonRoot: true
+
+# -- [Readiness
+# probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+# configuration for the `guardrails` container. Failed readinessProbes remove the pod from the service.
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+  failureThreshold: 2
+  periodSeconds: 10
+
+# -- Number of replicas for the service.
+replicaCount: 4
+
+# -- [Resources](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) for the `guardrails`
+# container.
 resources:
   requests:
     cpu: "4"
@@ -109,43 +179,58 @@ resources:
     memory: 4Gi
     ephemeral-storage: 250Mi
 
-# -- [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container.
-livenessProbe:
+# -- [Security
+# context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+# for the `guardrails` container.
+securityContext:
+  privileged: false
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1000
+  capabilities:
+    drop: ["ALL"]
+
+service:
+  # -- Service annotations.
+  annotations: {}
+  # -- Service Type, i.e. ClusterIp, LoadBalancer, etc.
+  type: ClusterIP
+  # -- Service HTTP port.
+  port: 80
+  # -- The port on which the application container is listening.
+  targetPort: 8000
+
+serviceAccount:
+  # -- If `true`, create a new `ServiceAccount`.
+  create: true
+  # -- (string) If this is set and `serviceAccount.create` is `true` this will be used for the created `ServiceAccount`
+  # name, if set and `serviceAccount.create` is `false` then this will define an existing `ServiceAccount` to use.
+  name: ""
+  # -- Labels to add to the service account.
+  labels: {}
+  # -- Annotations to add to the service account.
+  annotations: {}
+  # -- Set this to `false` to [opt out of API credential
+  # automounting](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/#opt-out-of-api-credential-automounting)
+  # for the `ServiceAccount`.
+  automount: true
+
+# -- [Readiness
+# probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/)
+# configuration for the `guardrails` container. Liveness and readiness probes are suppressed until the startup probe
+# succeeds.
+startupProbe:
   httpGet:
     path: /health
     port: 8000
-  failureThreshold: 3
-  initialDelaySeconds: 30
-  periodSeconds: 30
+  failureThreshold: 20
+  initialDelaySeconds: 20
+  periodSeconds: 10
 
-# -- [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container.
-readinessProbe:
-  httpGet:
-    path: /health
-    port: 8000
-  failureThreshold: 10
-  initialDelaySeconds: 30
-  periodSeconds: 30
+# -- (string) tenancyMode for the guardrails service. Must be `SINGLE` or `MULTI`.
+tenancyMode: MULTI
 
-# -- [Horizontal Pod Autoscaler](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) configuration for the `guardrails` container.
-autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 70
-  # targetMemoryUtilizationPercentage: 70
-
-# -- Extra [volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the `Pod`.
-extraVolumes: []
-
-# -- Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container.
-extraVolumeMounts: []
-
-# -- Node labels to match for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
-nodeSelector: {}
-
-# -- Node taints which will be tolerated for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+# -- Node taints which will be tolerated for `Pod`
+# [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
 tolerations: []
-
-# -- Affinity settings for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). If an explicit label selector is not provided for pod affinity or pod anti-affinity one will be created from the pod selector labels.
-affinity: {}

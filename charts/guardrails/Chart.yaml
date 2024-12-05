@@ -2,5 +2,6 @@ apiVersion: v2
 name: guardrails
 description: A Helm chart for WhyLabs Guardrails
 type: application
-version: 0.3.1
-appVersion: "2.0.1"
+version: 0.5.0
+appVersion: "2.2.2"
+icon: "https://whylabs.ai/_next/static/images/whylabs-favicon-192c009321aebbb96c19921a170fc880.png"
