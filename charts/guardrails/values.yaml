@@ -68,10 +68,9 @@ commonLabels: {}
 # for the `guardrails` container. **Supports Helm templating syntax**, e.g. you can use `{{ .Release.Name }}` or other
 # templating variables, functions, and conditions within the the value of each environment variable.
 env:
-  # Uncomment WHYLABS_API_CACHE_ENDPOINT if .Values.cache.enable is true 
-  # WHYLABS_API_CACHE_ENDPOINT: "{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local"
-  # @ignored
+  WHYLABS_API_CACHE_ENDPOINT: "{{ if .Values.cache.enable }}{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local{{ else }}{{ end }}"
   TENANCY_MODE: "{{ .Values.tenancyMode | default \"SINGLE\" }}"
+  CONFIG_SYNC_INTERVAL: "1"
 
 # -- Create environment variables from Kubernetes secrets or config maps.
 envFrom:
@@ -229,7 +228,7 @@ startupProbe:
   periodSeconds: 10
 
 # -- (string) tenancyMode for the guardrails service. Must be `SINGLE` or `MULTI`.
-tenancyMode: MULTI
+tenancyMode: SINGLE
 
 # -- Node taints which will be tolerated for `Pod`
 # [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).

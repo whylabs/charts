@@ -4,12 +4,12 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}-nginx
   labels:
-    {{- include "guardrails.labels" . | nindent 4 }}
+    {{- include "guardrails.cacheLabels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.cache.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-nginx
+      {{- include "guardrails.cacheSelectorLabels" . | nindent 8 }}
   template:
     metadata:
       {{- with .Values.cache.annotations }}
@@ -17,10 +17,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "guardrails.labels" . | nindent 8 }}
-        app: {{ .Release.Name }}-nginx
-        app.kubernetes.io/name: {{ include "guardrails.name" . }}-nginx
-        app.kubernetes.io/instance: {{ .Release.Name }}-nginx
+        {{- include "guardrails.cacheLabels" . | nindent 8 }}
     spec:
       serviceAccountName: {{ include "guardrails.serviceAccountName" . }}
       securityContext:

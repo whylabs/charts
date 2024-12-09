@@ -11,5 +11,5 @@ spec:
       port: 80
       targetPort: 8080
   selector:
-    app: {{ .Release.Name }}-nginx
+    {{- include "guardrails.cacheSelectorLabels" . | nindent 4 }}
 {{- end }}

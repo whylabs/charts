@@ -1,6 +1,6 @@
 # guardrails
 
-![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.2](https://img.shields.io/badge/AppVersion-2.2.2-informational?style=flat-square)
+![Version: 0.5.1](https://img.shields.io/badge/Version-0.5.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.2](https://img.shields.io/badge/AppVersion-2.2.2-informational?style=flat-square)
 
 A Helm chart for WhyLabs Guardrails
 
@@ -118,14 +118,14 @@ release_name=""
 # the working directory or --destination path
 helm pull \
   oci://ghcr.io/whylabs/guardrails \
-  --version 0.5.0
+  --version 0.5.1
 
 # Requires the helm-diff plugin to be installed:
 # helm plugin install https://github.com/databus23/helm-diff
 helm diff upgrade \
   --allow-unreleased \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.5.0.tgz
+  "${release_name}" guardrails-0.5.1.tgz
 ```
 
 After you've installed the repo you can install the chart.
@@ -134,7 +134,7 @@ After you've installed the repo you can install the chart.
 helm upgrade --install \
   --create-namespace \
   --namespace "${target_namespace}" \
-  "${release_name}" guardrails-0.5.0.tgz
+  "${release_name}" guardrails-0.5.1.tgz
 ```
 
 ## Exposing Guardrails Outside Kubernetes
@@ -290,7 +290,7 @@ autoscaling:
 | cache.labels | object | `{}` | Labels for the cache. |
 | cache.replicaCount | int | `1` | Number of replicas for the cache. |
 | commonLabels | object | `{}` | Labels to add to all chart resources. |
-| env | object | `{}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. **Supports Helm templating syntax**, e.g. you can use `{{ .Release.Name }}` or other templating variables, functions, and conditions within the the value of each environment variable. |
+| env | object | `{"CONFIG_SYNC_INTERVAL":"1","TENANCY_MODE":"{{ .Values.tenancyMode | default \"SINGLE\" }}","WHYLABS_API_CACHE_ENDPOINT":"{{ if .Values.cache.enable }}{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local{{ else }}{{ end }}"}` | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the `guardrails` container. **Supports Helm templating syntax**, e.g. you can use `{{ .Release.Name }}` or other templating variables, functions, and conditions within the the value of each environment variable. |
 | envFrom | list | `[{"secretRef":{"name":"whylabs-guardrails-api-key","optional":true}},{"secretRef":{"name":"whylabs-guardrails-api-secret","optional":true}}]` | Create environment variables from Kubernetes secrets or config maps. |
 | envFrom[0].secretRef.name | string | `"whylabs-guardrails-api-key"` | Name of the Kubernetes secret containing the API key. The secret must be in the same namespace as the release and should be created prior to installing the chart. |
 | envFrom[1].secretRef.name | string | `"whylabs-guardrails-api-secret"` | Name of the Kubernetes secret containing the container password, the value used when executing requests against the guardrails container. The secret must be in the same namespace as the release and should be created prior to installing the chart. |
@@ -322,7 +322,7 @@ autoscaling:
 | serviceAccount.labels | object | `{}` | Labels to add to the service account. |
 | serviceAccount.name | string | `""` | If this is set and `serviceAccount.create` is `true` this will be used for the created `ServiceAccount` name, if set and `serviceAccount.create` is `false` then this will define an existing `ServiceAccount` to use. |
 | startupProbe | object | `{"failureThreshold":20,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":20,"periodSeconds":10}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. Liveness and readiness probes are suppressed until the startup probe succeeds. |
-| tenancyMode | string | `"MULTI"` | tenancyMode for the guardrails service. Must be `SINGLE` or `MULTI`. |
+| tenancyMode | string | `"SINGLE"` | tenancyMode for the guardrails service. Must be `SINGLE` or `MULTI`. |
 | tolerations | list | `[]` | Node taints which will be tolerated for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). |
 
 ----------------------------------------------
