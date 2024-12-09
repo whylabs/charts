@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning]
   previous chart versions. The cache layer deployment selector labels have been
   updated to be independently unique.
 
+### Changed
+
+- Conditionally set `WHYLABS_API_CACHE_ENDPOINT` environment variable based on
+  the `cache.enable` value.
+
 ## [0.5.0] - 2024-12-02
 
 ### Added
