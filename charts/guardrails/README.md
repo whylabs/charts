@@ -322,7 +322,7 @@ autoscaling:
 | serviceAccount.labels | object | `{}` | Labels to add to the service account. |
 | serviceAccount.name | string | `""` | If this is set and `serviceAccount.create` is `true` this will be used for the created `ServiceAccount` name, if set and `serviceAccount.create` is `false` then this will define an existing `ServiceAccount` to use. |
 | startupProbe | object | `{"failureThreshold":20,"httpGet":{"path":"/health","port":8000},"initialDelaySeconds":20,"periodSeconds":10}` | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) configuration for the `guardrails` container. Liveness and readiness probes are suppressed until the startup probe succeeds. |
-| tenancyMode | string | `"MULTI"` | tenancyMode for the guardrails service. Must be `SINGLE` or `MULTI`. |
+| tenancyMode | string | `"SINGLE"` | tenancyMode for the guardrails service. Must be `SINGLE` or `MULTI`. |
 | tolerations | list | `[]` | Node taints which will be tolerated for `Pod` [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). |
 
 ----------------------------------------------

@@ -228,7 +228,7 @@ startupProbe:
   periodSeconds: 10
 
 # -- (string) tenancyMode for the guardrails service. Must be `SINGLE` or `MULTI`.
-tenancyMode: MULTI
+tenancyMode: SINGLE
 
 # -- Node taints which will be tolerated for `Pod`
 # [scheduling](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
