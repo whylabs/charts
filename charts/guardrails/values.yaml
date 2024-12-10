@@ -68,7 +68,7 @@ commonLabels: {}
 # for the `guardrails` container. **Supports Helm templating syntax**, e.g. you can use `{{ .Release.Name }}` or other
 # templating variables, functions, and conditions within the the value of each environment variable.
 env:
-  WHYLABS_API_CACHE_ENDPOINT: "{{ if .Values.cache.enable }}{{ .Release.Name }}.{{ .Release.Namespace }}.svc.cluster.local{{ else }}{{ end }}"
+  WHYLABS_API_CACHE_ENDPOINT: "{{ if .Values.cache.enable }}{{ .Release.Name }}-nginx.{{ .Release.Namespace }}.svc.cluster.local{{ else }}{{ end }}"
   TENANCY_MODE: "{{ .Values.tenancyMode | default \"SINGLE\" }}"
   CONFIG_SYNC_INTERVAL: "1"
 
