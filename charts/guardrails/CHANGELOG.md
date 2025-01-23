@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning]
 (https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] - 2025-01-23
+
+### Removed
+
+- Cache endpoint
+- Unused secrets
+
+### Changed
+
+- Default image to `whylabs/whylogs:3.0.0`
+
+### Added
+
+- `s3_profile_upload_bucket` and `static_secret` environment variables
+
+- New variables
+
 ## [0.5.2] - 2024-12-09
 
 ### Fixed
