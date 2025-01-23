@@ -46,34 +46,11 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Cache labels
-*/}}
-{{- define "guardrails.cacheLabels" -}}
-helm.sh/chart: {{ include "guardrails.chart" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- with .Values.commonLabels }}
-{{ toYaml . }}
-{{- end }}
-{{ include "guardrails.cacheSelectorLabels" . }}
-{{- end }}
-
-{{/*
 Selector labels
 */}}
 {{- define "guardrails.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "guardrails.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Cache Selector labels
-*/}}
-{{- define "guardrails.cacheSelectorLabels" -}}
-app.kubernetes.io/name: {{ include "guardrails.name" . }}-nginx
-app.kubernetes.io/instance: {{ .Release.Name }}-nginx
 {{- end }}
 
 {{/*

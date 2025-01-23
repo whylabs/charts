@@ -47,20 +47,6 @@ autoscaling:
     #   selectPolicy: Max
     #   stabilizationWindowSeconds: 300
 
-cache:
-  # -- Enable or disable caching.
-  enable: true
-  # -- Duration for cache validity.
-  duration: 1m
-  # -- Number of replicas for the cache.
-  replicaCount: 1
-  # -- Endpoint for the cache service.
-  endpoint: "api.whylabsapp.com"
-  # -- Annotations for the cache.
-  annotations: {}
-  # -- Labels for the cache.
-  labels: {}
-
 # -- Labels to add to all chart resources.
 commonLabels: {}
 
@@ -68,23 +54,22 @@ commonLabels: {}
 # for the `guardrails` container. **Supports Helm templating syntax**, e.g. you can use `{{ .Release.Name }}` or other
 # templating variables, functions, and conditions within the the value of each environment variable.
 env:
-  WHYLABS_API_CACHE_ENDPOINT: "{{ if .Values.cache.enable }}{{ .Release.Name }}-nginx.{{ .Release.Namespace }}.svc.cluster.local{{ else }}{{ end }}"
-  TENANCY_MODE: "{{ .Values.tenancyMode | default \"SINGLE\" }}"
-  CONFIG_SYNC_INTERVAL: "1"
+  static_secret: password
+  s3_profile_upload_bucket: my-profile-upload-bucket
 
 # -- Create environment variables from Kubernetes secrets or config maps.
 envFrom:
-  - secretRef:
-      # -- Name of the Kubernetes secret containing the API key. The secret must be in the same namespace as the
-      # release and should be created prior to installing the chart.
-      name: whylabs-guardrails-api-key
-      optional: true
-  - secretRef:
-      # -- Name of the Kubernetes secret containing the container password, the value used when executing requests
-      # against the guardrails container. The secret must be in the same namespace as the release and should be
-      # created prior to installing the chart.
-      name: whylabs-guardrails-api-secret
-      optional: true
+  # - secretRef:
+  #     # -- Name of the Kubernetes secret containing the API key. The secret must be in the same namespace as the
+  #     # release and should be created prior to installing the chart.
+  #     name: whylabs-guardrails-api-key
+  #     optional: true
+  # - secretRef:
+  #     # -- Name of the Kubernetes secret containing the container password, the value used when executing requests
+  #     # against the guardrails container. The secret must be in the same namespace as the release and should be
+  #     # created prior to installing the chart.
+  #     name: whylabs-guardrails-api-secret
+  #     optional: true
 
 # -- Extra [volume mounts](https://kubernetes.io/docs/concepts/storage/volumes/) for the `guardrails` container.
 extraVolumeMounts: []
@@ -99,9 +84,9 @@ image:
   # -- Image pull policy for the `guardrails` container.
   pullPolicy: IfNotPresent
   # -- Image repository for the `guardrails` container.
-  repository: registry.gitlab.com/whylabs/langkit-container
+  repository: whylabs/whylogs
   # -- (string) Image tag for the `guardrails` container, this will default to `.Chart.AppVersion` if not set.
-  tag: "2.2.2"
+  tag: "3.0.0"
 
 imagePullSecrets: []
   # -- Image pull secrets for the `guardrails` container. If `name` is set to `""`, then the default value of
@@ -112,15 +97,15 @@ imagePullSecrets: []
 # `guardrails` container.
 ingress:
   enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
+  # className: ""
+  # annotations: {}
+  #   # kubernetes.io/ingress.class: nginx kubernetes.io/tls-acme: "true"
+  # hosts:
+  #   - host: chart-example.local
+  #     paths:
+  #       - path: /
+  #         pathType: ImplementationSpecific
+  # tls:
   #  - secretName: chart-example-tls hosts:
   #      - chart-example.local
 
